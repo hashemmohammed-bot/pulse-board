@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DEMO_HINT, verifyCredentials } from "../auth";
+import { verifyCredentials } from "../auth";
 
 type FieldError = { field: "name" | "password"; message: string } | null;
 
@@ -89,10 +89,6 @@ export function Login({ onSignedIn }: { onSignedIn: (username: string) => void }
           </button>
         </form>
 
-        <p className="mt-6 rounded-xl bg-canvas px-4 py-3 text-sm text-muted">
-          Demo build — sign in with <span className="font-semibold text-ink">{DEMO_HINT}</span>. The
-          credential is checked in the browser and grants no real access.
-        </p>
       </div>
     </main>
   );
