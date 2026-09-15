@@ -10,6 +10,17 @@
   are hashed at build time and cannot be referenced from a stylesheet. Keep
   these in sync with `canvas`/`ink` in tokens.stylex.ts.
 */
+/*
+  Removing Tailwind also removed its preflight, which set this. Without it, a
+  `width: 100%` input adds its padding and border on top of that width and
+  overflows its container — which is what the login fields were doing.
+*/
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html {
   background: #eceef4;
   color: #16181d;
