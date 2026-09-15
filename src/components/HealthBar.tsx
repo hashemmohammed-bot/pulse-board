@@ -1,12 +1,30 @@
+import * as stylex from "@stylexjs/stylex";
+import { colors, radius } from "@/styles/tokens.stylex";
+
+const styles = stylex.create({
+  wrap: { display: "inline-flex", alignItems: "center", gap: "8px", verticalAlign: "middle" },
+  track: {
+    height: "6px",
+    overflow: "hidden",
+    borderRadius: radius.full,
+    backgroundColor: colors.canvas,
+  },
+  fill: { display: "block", height: "100%", borderRadius: radius.full },
+  good: { backgroundColor: colors.good },
+  warn: { backgroundColor: colors.warn },
+  bad: { backgroundColor: colors.bad },
+  score: { width: "28px", textAlign: "right", fontVariantNumeric: "tabular-nums" },
+});
+
 /** Account health as a filled bar plus the raw score, coloured by band. */
-export function HealthBar({ score, width = "w-16" }: { score: number; width?: string }) {
-  const tone = score >= 70 ? "bg-good" : score >= 40 ? "bg-warn" : "bg-bad";
+export function HealthBar({ score, width = 64 }: { score: number; width?: number }) {
+  const tone = score >= 70 ? styles.good : score >= 40 ? styles.warn : styles.bad;
   return (
-    <span className="inline-flex items-center gap-2 align-middle">
-      <span className={`h-1.5 ${width} overflow-hidden rounded-full bg-canvas`} aria-hidden="true">
-        <span className={`block h-full rounded-full ${tone}`} style={{ width: `${score}%` }} />
+    <span {...stylex.props(styles.wrap)}>
+      <span aria-hidden="true" {...stylex.props(styles.track)} style={{ width }}>
+        <span {...stylex.props(styles.fill, tone)} style={{ width: `${score}%` }} />
       </span>
-      <span className="w-7 text-right tabular-nums">{score}</span>
+      <span {...stylex.props(styles.score)}>{score}</span>
     </span>
   );
 }

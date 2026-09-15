@@ -1,12 +1,10 @@
-import { Badge } from "@/components/ui/badge";
-
-type Tone = "success" | "warning" | "danger" | "info" | "secondary";
+import { Badge, type BadgeTone } from "@/components/ui/badge";
 
 /**
  * Maps an account or user status onto a badge tone. The label itself is never
  * translated: it comes from the dataset and the acceptance test matches on it.
  */
-function toneFor(label: string): Tone {
+function toneFor(label: string): BadgeTone {
   switch (label) {
     case "Active":
       return "success";
@@ -19,14 +17,10 @@ function toneFor(label: string): Tone {
     case "Suspended":
       return "danger";
     default:
-      return "secondary";
+      return "neutral";
   }
 }
 
 export function StatusBadge({ label }: { label: string }) {
-  return (
-    <Badge variant={toneFor(label)} className="px-3 py-1 text-sm font-semibold">
-      {label}
-    </Badge>
-  );
+  return <Badge tone={toneFor(label)}>{label}</Badge>;
 }

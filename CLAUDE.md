@@ -1,9 +1,12 @@
 # PulseBoard
 
-React 19 + TypeScript + Vite. Tailwind CSS v4. Recharts v3. Playwright for tests.
+React 19 + TypeScript + Vite. StyleX for styling, TanStack Router for routing,
+react-i18next for copy, Radix for dialog behaviour, Recharts v3 for the chart.
+Playwright for tests. There is no Tailwind and no shadcn/ui in this project.
 
 - `npm run dev` — dev server on http://localhost:5173
-- `npm test` — acceptance tests (starts the dev server if needed)
+- `npm test` — acceptance tests (starts their own server on :5174)
+- `npm run test:auth` — sign-in tests
 - `npm run typecheck` — tsc
 - `npm run screenshot` — writes desktop/tablet/mobile PNGs to `screenshots/`
 
@@ -58,12 +61,28 @@ Delta colour follows `higherIsBetter`: green when the change is good news, red w
 
 ## Conventions
 
-- No router. `App.tsx` holds `page: "dashboard" | "users"` in `useState`.
-- Tailwind v4: `@import "tailwindcss"` in `src/styles.css`, `@theme` for tokens. There is no
-  `tailwind.config.js` in v4.
-- Recharts v3: pass `responsive` on the chart component instead of wrapping in
-  `ResponsiveContainer`, and give the wrapper a fixed height — a zero-height parent makes
-  Recharts log warnings, which fails rule 1.
+- **Routing**: TanStack Router, code-based, whole tree in `src/routes.tsx`. `/` is the
+  dashboard and `/users` is Users; the root route renders the header and an `<Outlet/>`.
+- **Shared state**: `App.tsx` owns the dataset, the Users edits, the theme and the session
+  and publishes them through `src/app-context.ts`. It sits above `RouterProvider`, which is
+  what makes edits survive a route change.
+- **Styling**: StyleX only. Tokens live in `src/styles/tokens.stylex.ts` (the `.stylex.ts`
+  suffix is required by the compiler). Never write a raw hex in a component; add a token.
+  Use CSS **longhands** — `backgroundColor`, `borderWidth`, `borderStyle` — because a later
+  longhand cannot reliably override an earlier shorthand in StyleX's atomic output.
+- **Shared style objects** are in `src/styles/shared.ts`; primitives in `src/components/ui`
+  take an `sx` prop rather than `className`.
+- **The StyleX compiler resolves `*.stylex.ts` imports itself**, so the `@` alias is declared
+  twice in `vite.config.ts`: once in `resolve.alias` for Vite, once in the plugin's `aliases`
+  option. Adding an alias to only one of them fails the build.
+- **i18n**: copy lives in `src/i18n/en.ts` and `fr.ts`; `fr` is typed against `en`, so a
+  missing French key is a type error. Values that come from the dataset — status, role, plan,
+  region, names — are **never** translated; the acceptance test matches them literally.
+  Currency and percentages stay en-US for the same reason. Dates follow the active language.
+- **Recharts**: keep the chart wrapper at a fixed height — a zero-height parent makes
+  ResponsiveContainer log warnings, which fails rule 1.
+- **The role field must stay a native `<select>`**. The test drives it with `selectOption()`,
+  which needs a real `<select name="role">`.
 - Every `data-testid` in `SPEC.md` is exact. Grep the spec before renaming anything.
 
 ## Persistence
@@ -76,19 +95,24 @@ each test a fresh context, so the store never leaks between acceptance runs.
 
 ## Theming
 
-Light and dark share one token set. `@theme` in `src/styles.css` defines the light values;
-the dark block redefines the same `--color-*` variables, so components need no `dark:`
-variants — they already paint with tokens. Add new colours as tokens, never as hex in a
-component.
+Light and dark share one token set. `tokens.stylex.ts` holds the light values with a
+`prefers-color-scheme: dark` variant on each, so the page is themed before any JavaScript
+runs. `src/styles/themes.ts` then builds explicit `lightTheme`/`darkTheme` with
+`stylex.createTheme`, and `App.tsx` applies one of them to a wrapper that encloses the login
+screen, the router and every portalled dialog.
 
-The theme follows `prefers-color-scheme` until the visitor clicks the toggle, which writes
-`data-theme` on `<html>` and stores the choice under `pulseboard.theme.v1`. An inline script
-in `index.html` replays that choice before first paint to avoid a flash of light.
+The toggle also writes `data-theme` on `<html>`, and an inline script in `index.html` replays
+the stored choice before first paint to avoid a flash of light.
 
-Recharts writes colours as presentation attributes, which lose to CSS, so the axis ticks
-(`.recharts-cartesian-axis-tick-value` — note v3 does *not* nest the text inside
-`.recharts-cartesian-axis-tick`) and grid lines are themed from `styles.css`. Tooltip styling
-is inline and uses `var(--color-*)`, which resolves correctly in inline styles.
+`src/styles/global.css` starts with `@stylex;` — that is where the compiled atomic CSS is
+injected. It also holds the only two things StyleX cannot reach:
+
+- the document element, which repeats the canvas colours literally because StyleX variable
+  names are hashed at build time and cannot be referenced from a stylesheet;
+- the Recharts axis and grid. Recharts writes colours as presentation attributes, which lose
+  to any CSS rule. The tick selector is `.recharts-cartesian-axis-tick-value`: in Recharts v3
+  the label text is **not** a descendant of `.recharts-cartesian-axis-tick`, so the obvious
+  selector silently leaves the labels at the library default.
 
 ## Dialogs
 
@@ -114,8 +138,9 @@ key by hand. Do not copy this shape into anything real.
 - `?login=1` forces the login screen even when the gate is off — that is how the login
   screenshot and `tests/auth.spec.ts` reach it.
 
-**Ordering trap:** `reuseExistingServer` is on. A dev server already running with the gate
-enabled gets reused by Playwright, and all 13 acceptance tests then stop at the login screen.
-Stop your dev server before `npm test`.
+Tests run their own server on **port 5174** with `reuseExistingServer: false`, so a dev
+server on 5173 is never reused and the two cannot interfere. An earlier version shared the
+port and reused whatever was running — which meant a dev server started with the gate on sent
+all 13 tests to the login screen.
 
 Run `npm run test:auth` for the sign-in tests (not part of the acceptance contract).

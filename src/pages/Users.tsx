@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import * as stylex from "@stylexjs/stylex";
 import type { User } from "@/types";
 import { formatDate, initials } from "@/format";
 import { dateLocale } from "@/i18n";
@@ -16,11 +17,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { colors, radius } from "@/styles/tokens.stylex";
+import { card, cardSubtitle, cardTitle, muted, pr, right, sectionHead } from "@/styles/shared";
 
 /** null = the form is closed; "new" = creating; a User = editing that user. */
 type FormState = null | "new" | User;
 
 const COLUMNS = ["name", "email", "role", "team", "status", "lastLogin", "actions"] as const;
+
+const styles = stylex.create({
+  tableWrap: { marginTop: "16px" },
+  table: { minWidth: "820px" },
+  editing: { backgroundColor: colors.brand50 },
+  nameCell: { display: "flex", alignItems: "center", gap: "12px" },
+  avatar: {
+    display: "grid",
+    placeItems: "center",
+    height: "36px",
+    width: "36px",
+    flexShrink: 0,
+    borderRadius: radius.full,
+    backgroundColor: colors.brand50,
+    color: colors.brand600,
+    fontSize: "14px",
+    fontWeight: 600,
+  },
+  name: { fontWeight: 600 },
+  actions: { textAlign: "right", whiteSpace: "nowrap" },
+  deleteButton: { marginLeft: "8px", color: colors.bad },
+});
 
 export function Users() {
   const { t, i18n } = useTranslation();
@@ -55,33 +80,23 @@ export function Users() {
 
   return (
     <div data-testid="users-page">
-      <section className="rounded-2xl border border-line bg-surface p-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+      <section {...stylex.props(card)}>
+        <div {...stylex.props(sectionHead)}>
           <div>
-            <h2 className="text-lg font-bold tracking-tight">{t("users.title")}</h2>
-            <p className="mt-1 text-sm text-muted">{t("users.count", { count: users.length })}</p>
+            <h2 {...stylex.props(cardTitle)}>{t("users.title")}</h2>
+            <p {...stylex.props(cardSubtitle)}>{t("users.count", { count: users.length })}</p>
           </div>
-          <Button
-            type="button"
-            data-testid="user-create"
-            onClick={() => setForm("new")}
-            className="rounded-xl px-5"
-          >
+          <Button data-testid="user-create" onClick={() => setForm("new")}>
             {t("users.new")}
           </Button>
         </div>
 
-        <div className="mt-4">
-          <Table data-testid="users-table" className="min-w-[820px] text-left">
+        <div {...stylex.props(styles.tableWrap)}>
+          <Table data-testid="users-table" sx={styles.table}>
             <TableHeader>
-              <TableRow className="border-line hover:bg-transparent">
+              <TableRow head>
                 {COLUMNS.map((col) => (
-                  <TableHead
-                    key={col}
-                    className={`text-sm font-medium text-muted ${
-                      col === "actions" ? "text-right" : "pr-4"
-                    }`}
-                  >
+                  <TableHead key={col} sx={col === "actions" ? right : pr}>
                     {t(`users.columns.${col}`)}
                   </TableHead>
                 ))}
@@ -93,33 +108,25 @@ export function Users() {
                   key={u.id}
                   data-testid="user-row"
                   data-user-id={u.id}
-                  className={`border-line/70 ${
-                    form !== "new" && form?.id === u.id ? "bg-brand-50" : ""
-                  }`}
+                  sx={form !== "new" && form?.id === u.id ? styles.editing : null}
                 >
-                  <TableCell className="py-3.5 pr-4">
-                    <span className="flex items-center gap-3">
-                      <span
-                        aria-hidden="true"
-                        className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-sm font-semibold text-brand-600"
-                      >
+                  <TableCell sx={pr}>
+                    <span {...stylex.props(styles.nameCell)}>
+                      <span aria-hidden="true" {...stylex.props(styles.avatar)}>
                         {initials(u.name)}
                       </span>
-                      <span className="font-semibold">{u.name}</span>
+                      <span {...stylex.props(styles.name)}>{u.name}</span>
                     </span>
                   </TableCell>
-                  <TableCell className="py-3.5 pr-4">{u.email}</TableCell>
-                  <TableCell className="py-3.5 pr-4">{u.role}</TableCell>
-                  <TableCell className="py-3.5 pr-4">{u.team}</TableCell>
-                  <TableCell className="py-3.5 pr-4">
+                  <TableCell sx={pr}>{u.email}</TableCell>
+                  <TableCell sx={pr}>{u.role}</TableCell>
+                  <TableCell sx={pr}>{u.team}</TableCell>
+                  <TableCell sx={pr}>
                     <StatusBadge label={u.status} />
                   </TableCell>
-                  <TableCell className="py-3.5 pr-4 text-muted">
-                    {formatDate(u.lastLoginAt, locale)}
-                  </TableCell>
-                  <TableCell className="py-3.5 text-right whitespace-nowrap">
+                  <TableCell sx={[pr, muted]}>{formatDate(u.lastLoginAt, locale)}</TableCell>
+                  <TableCell sx={styles.actions}>
                     <Button
-                      type="button"
                       variant="outline"
                       size="sm"
                       data-testid="user-edit"
@@ -129,13 +136,12 @@ export function Users() {
                       {t("users.edit")}
                     </Button>
                     <Button
-                      type="button"
                       variant="outline"
                       size="sm"
                       data-testid="user-delete"
                       onClick={() => setPendingDelete(u)}
                       aria-label={t("users.deleteLabel", { name: u.name })}
-                      className="ml-2 text-bad hover:bg-bad-soft hover:text-bad"
+                      sx={styles.deleteButton}
                     >
                       {t("users.delete")}
                     </Button>

@@ -16,22 +16,19 @@
     "test:auth": "playwright test tests/auth.spec.ts"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.3.3",
+    "@stylexjs/stylex": "^0.19.0",
     "@tanstack/react-router": "^1.170.36",
-    "class-variance-authority": "^0.7.1",
-    "cn": "^0.3.0",
     "i18next": "^26.4.2",
     "i18next-browser-languagedetector": "^8.2.1",
-    "lucide-react": "^1.46.0",
     "radix-ui": "^1.6.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-i18next": "^17.0.14",
-    "recharts": "^3.10.1",
-    "tailwindcss": "^4.3.3"
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",
+    "@stylexjs/unplugin": "^0.19.0",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",

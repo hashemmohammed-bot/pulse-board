@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { RouterProvider } from "@tanstack/react-router";
+import * as stylex from "@stylexjs/stylex";
 import { useTranslation } from "react-i18next";
 import type { DashboardData, User } from "./types";
 import { Login } from "./pages/Login";
@@ -7,6 +8,14 @@ import { router } from "./routes";
 import { AppStateProvider } from "./app-context";
 import { applyTheme, storedTheme, systemTheme, type Theme } from "./theme";
 import { AUTH_REQUIRED, endSession, readSession, startSession } from "./auth";
+import { darkTheme, lightTheme } from "./styles/themes";
+import { colors } from "./styles/tokens.stylex";
+
+const styles = stylex.create({
+  root: { minHeight: "100vh", backgroundColor: colors.canvas, color: colors.ink },
+  message: { padding: "24px" },
+  error: { color: colors.bad },
+});
 
 /** Bumped whenever the stored shape changes, so old entries are ignored. */
 const STORAGE_KEY = "pulseboard.users.v1";
@@ -77,36 +86,42 @@ export default function App() {
     applyTheme(next);
   }
 
+  // The theme variables are applied here, above everything else, so the login
+  // screen, the router and every portalled dialog resolve the same palette.
+  const themed = (children: ReactNode) => (
+    <div {...stylex.props(theme === "dark" ? darkTheme : lightTheme, styles.root)}>{children}</div>
+  );
+
   if (!session && (AUTH_REQUIRED || loginForced())) {
-    return (
+    return themed(
       <Login
         onSignedIn={(username) => {
           startSession(username);
           setSession(username);
         }}
-      />
+      />,
     );
   }
 
   if (loadError) {
-    return (
-      <main className="p-6">
-        <p role="alert" className="rounded-2xl border border-line bg-surface p-6 text-bad">
+    return themed(
+      <main {...stylex.props(styles.message)}>
+        <p role="alert" {...stylex.props(styles.error)}>
           {t("app.loadError", { message: loadError })}
         </p>
-      </main>
+      </main>,
     );
   }
 
   if (!data) {
-    return (
-      <main className="p-6">
-        <p className="text-muted">{t("app.loading")}</p>
-      </main>
+    return themed(
+      <main {...stylex.props(styles.message)}>
+        <p>{t("app.loading")}</p>
+      </main>,
     );
   }
 
-  return (
+  return themed(
     <AppStateProvider
       value={{
         data,
@@ -125,6 +140,6 @@ export default function App() {
       }}
     >
       <RouterProvider router={router} />
-    </AppStateProvider>
+    </AppStateProvider>,
   );
 }

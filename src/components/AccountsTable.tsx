@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import * as stylex from "@stylexjs/stylex";
 import type { Account } from "@/types";
 import { currency } from "@/format";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -13,9 +14,40 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { colors } from "@/styles/tokens.stylex";
+import { card, cardSubtitle, cardTitle, numeric, pr, right, sectionHead } from "@/styles/shared";
 
 type SortKey = "name" | "plan" | "region" | "owner" | "mrr" | "seats" | "status" | "health";
 type SortState = { key: SortKey; dir: "asc" | "desc" } | null;
+
+const styles = stylex.create({
+  filter: { maxWidth: "320px" },
+  tableWrap: { marginTop: "16px" },
+  table: { minWidth: "820px" },
+  sortButton: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "4px",
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    borderStyle: "none",
+    padding: 0,
+    font: "inherit",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    color: { default: colors.muted, ":hover": colors.ink },
+    outline: { default: "none", ":focus-visible": `2px solid ${colors.brand500}` },
+  },
+  sortActive: { color: colors.ink },
+  sortNumeric: { flexDirection: "row-reverse" },
+  row: {
+    cursor: "pointer",
+    backgroundColor: { default: null, ":hover": colors.brand50 },
+  },
+  name: { fontWeight: 600 },
+  empty: { paddingBlock: "48px", textAlign: "center", color: colors.muted },
+});
 
 const COLUMNS: { key: SortKey; numeric?: boolean }[] = [
   { key: "name" },
@@ -66,11 +98,11 @@ export function AccountsTable({
     );
 
   return (
-    <section className="rounded-2xl border border-line bg-surface p-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <section {...stylex.props(card)}>
+      <div {...stylex.props(sectionHead)}>
         <div>
-          <h2 className="text-lg font-bold tracking-tight">{t("accounts.title")}</h2>
-          <p className="mt-1 text-sm text-muted">{t("accounts.count", { count: rows.length })}</p>
+          <h2 {...stylex.props(cardTitle)}>{t("accounts.title")}</h2>
+          <p {...stylex.props(cardSubtitle)}>{t("accounts.count", { count: rows.length })}</p>
         </div>
         <Input
           data-testid="table-filter"
@@ -78,14 +110,14 @@ export function AccountsTable({
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("accounts.filterPlaceholder")}
           aria-label={t("accounts.filterLabel")}
-          className="h-11 w-full max-w-xs rounded-xl bg-surface text-base"
+          sx={styles.filter}
         />
       </div>
 
-      <div className="mt-4">
-        <Table data-testid="accounts-table" className="min-w-[820px] text-left">
+      <div {...stylex.props(styles.tableWrap)}>
+        <Table data-testid="accounts-table" sx={styles.table}>
           <TableHeader>
-            <TableRow className="border-line hover:bg-transparent">
+            <TableRow head>
               {COLUMNS.map((col) => (
                 <TableHead
                   key={col.key}
@@ -96,17 +128,17 @@ export function AccountsTable({
                         : "descending"
                       : "none"
                   }
-                  className={`text-sm font-medium text-muted ${col.key === "health" ? "" : "pr-4"} ${
-                    col.numeric ? "text-right" : ""
-                  }`}
+                  sx={[col.key === "health" ? null : pr, col.numeric ? right : null]}
                 >
                   <button
                     type="button"
                     data-testid={`sort-${col.key}`}
                     onClick={() => toggleSort(col.key)}
-                    className={`inline-flex items-center gap-1 rounded transition hover:text-ink focus-visible:outline-2 focus-visible:outline-brand-600 ${
-                      col.numeric ? "flex-row-reverse" : ""
-                    } ${sort?.key === col.key ? "text-ink" : ""}`}
+                    {...stylex.props(
+                      styles.sortButton,
+                      col.numeric && styles.sortNumeric,
+                      sort?.key === col.key && styles.sortActive,
+                    )}
                   >
                     {t(`accounts.columns.${col.key}`)}
                     <span aria-hidden="true">
@@ -131,34 +163,27 @@ export function AccountsTable({
                     onSelect(a);
                   }
                 }}
-                className="cursor-pointer border-line/70 hover:bg-brand-50/60 focus-visible:bg-brand-50"
+                sx={styles.row}
               >
-                <TableCell className="py-3.5 pr-4 font-semibold">{a.name}</TableCell>
-                <TableCell className="py-3.5 pr-4">{a.plan}</TableCell>
-                <TableCell className="py-3.5 pr-4">{a.region}</TableCell>
-                <TableCell className="py-3.5 pr-4">{a.owner}</TableCell>
-                <TableCell
-                  data-testid="cell-mrr"
-                  className="py-3.5 pr-4 text-right tabular-nums"
-                >
+                <TableCell sx={[pr, styles.name]}>{a.name}</TableCell>
+                <TableCell sx={pr}>{a.plan}</TableCell>
+                <TableCell sx={pr}>{a.region}</TableCell>
+                <TableCell sx={pr}>{a.owner}</TableCell>
+                <TableCell data-testid="cell-mrr" sx={[pr, numeric]}>
                   {currency(a.mrr)}
                 </TableCell>
-                <TableCell className="py-3.5 pr-4 text-right tabular-nums">{a.seats}</TableCell>
-                <TableCell className="py-3.5 pr-4">
+                <TableCell sx={[pr, numeric]}>{a.seats}</TableCell>
+                <TableCell sx={pr}>
                   <StatusBadge label={a.status} />
                 </TableCell>
-                <TableCell className="py-3.5 text-right">
+                <TableCell sx={right}>
                   <HealthBar score={a.health} />
                 </TableCell>
               </TableRow>
             ))}
             {rows.length === 0 && (
-              <TableRow className="hover:bg-transparent">
-                <TableCell
-                  data-testid="table-empty"
-                  colSpan={COLUMNS.length}
-                  className="py-12 text-center text-muted"
-                >
+              <TableRow>
+                <TableCell data-testid="table-empty" colSpan={COLUMNS.length} sx={styles.empty}>
                   {t("accounts.empty", { query })}
                 </TableCell>
               </TableRow>

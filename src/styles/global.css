@@ -1,0 +1,82 @@
+/*
+  StyleX injects its compiled atomic CSS here. Everything else in this file is
+  plain CSS for the two things StyleX cannot reach: the document element, and
+  markup rendered by Recharts.
+*/
+@stylex;
+
+/*
+  The canvas colours are repeated literally because the StyleX variable names
+  are hashed at build time and cannot be referenced from a stylesheet. Keep
+  these in sync with `canvas`/`ink` in tokens.stylex.ts.
+*/
+html {
+  background: #eceef4;
+  color: #16181d;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    background: #0f1117;
+    color: #e8eaf0;
+    color-scheme: dark;
+  }
+}
+
+html[data-theme="dark"] {
+  background: #0f1117;
+  color: #e8eaf0;
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  background: #eceef4;
+  color: #16181d;
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+}
+
+/*
+  Recharts writes its colours as presentation attributes, which lose to any CSS
+  rule. In Recharts v3 the tick label is NOT a descendant of
+  .recharts-cartesian-axis-tick, so the tick-value class is what must be styled.
+*/
+.recharts-cartesian-axis-tick-value,
+.recharts-cartesian-axis-tick text {
+  fill: #6b7280;
+}
+
+.recharts-cartesian-grid line {
+  stroke: #e3e6ef;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .recharts-cartesian-axis-tick-value,
+  html:not([data-theme="light"]) .recharts-cartesian-axis-tick text {
+    fill: #9aa1ad;
+  }
+
+  html:not([data-theme="light"]) .recharts-cartesian-grid line {
+    stroke: #272c37;
+  }
+}
+
+html[data-theme="dark"] .recharts-cartesian-axis-tick-value,
+html[data-theme="dark"] .recharts-cartesian-axis-tick text {
+  fill: #9aa1ad;
+}
+
+html[data-theme="dark"] .recharts-cartesian-grid line {
+  stroke: #272c37;
+}
+
+/* Recharts draws its own focus outlines on every surface. */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}

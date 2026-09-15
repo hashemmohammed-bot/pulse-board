@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import * as stylex from "@stylexjs/stylex";
 import type { User, UserRole } from "@/types";
 import { Modal } from "@/components/Modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { colors, radius } from "@/styles/tokens.stylex";
 
 const ROLES: UserRole[] = ["Admin", "Manager", "Viewer"];
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -18,7 +20,27 @@ export interface UserDraft {
 
 type FieldError = { field: "name" | "email"; message: string } | null;
 
-const FIELD = "mt-1.5 h-11 w-full rounded-xl bg-surface text-base";
+const styles = stylex.create({
+  form: { display: "flex", flexDirection: "column", gap: "20px" },
+  field: { marginTop: "6px" },
+  error: { margin: 0, marginTop: "6px", fontSize: "14px", color: colors.bad },
+  select: {
+    marginTop: "6px",
+    width: "100%",
+    height: "44px",
+    paddingInline: "12px",
+    fontSize: "16px",
+    fontFamily: "inherit",
+    color: colors.ink,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: { default: colors.line, ":focus": colors.brand500 },
+    outline: "none",
+  },
+  actions: { display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "8px" },
+});
 
 export function UserForm({
   user,
@@ -63,13 +85,10 @@ export function UserForm({
 
   const errorFor = (field: "name" | "email") =>
     error?.field === field ? (
-      <p data-testid="form-error" role="alert" className="mt-1.5 text-sm text-bad">
+      <p data-testid="form-error" role="alert" {...stylex.props(styles.error)}>
         {error.message}
       </p>
     ) : null;
-
-  const ring = (field: "name" | "email") =>
-    error?.field === field ? " border-bad ring-2 ring-bad-soft" : "";
 
   return (
     <Modal
@@ -78,51 +97,46 @@ export function UserForm({
       onClose={onCancel}
       testId="user-dialog"
     >
-      <form data-testid="user-form" onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+      <form data-testid="user-form" onSubmit={handleSubmit} noValidate {...stylex.props(styles.form)}>
         <div>
-          <Label htmlFor="user-name" className="text-sm text-muted">
-            {t("userForm.name")}
-          </Label>
+          <Label htmlFor="user-name">{t("userForm.name")}</Label>
           <Input
             id="user-name"
             name="name"
             value={draft.name}
+            invalid={error?.field === "name"}
             onChange={(e) => set({ name: e.target.value })}
-            className={FIELD + ring("name")}
+            sx={styles.field}
           />
           {errorFor("name")}
         </div>
 
         <div>
-          <Label htmlFor="user-email" className="text-sm text-muted">
-            {t("userForm.email")}
-          </Label>
+          <Label htmlFor="user-email">{t("userForm.email")}</Label>
           <Input
             id="user-email"
             name="email"
             type="text"
             value={draft.email}
+            invalid={error?.field === "email"}
             onChange={(e) => set({ email: e.target.value })}
-            className={FIELD + ring("email")}
+            sx={styles.field}
           />
           {errorFor("email")}
         </div>
 
         <div>
-          <Label htmlFor="user-role" className="text-sm text-muted">
-            {t("userForm.role")}
-          </Label>
+          <Label htmlFor="user-role">{t("userForm.role")}</Label>
           {/*
             Deliberately a native <select>: the acceptance test drives it with
-            selectOption(), which needs a real <select name="role"> element and
-            would fail against the Radix-based shadcn Select.
+            selectOption(), which needs a real <select name="role"> element.
           */}
           <select
             id="user-role"
             name="role"
             value={draft.role}
             onChange={(e) => set({ role: e.target.value as UserRole })}
-            className="mt-1.5 h-11 w-full rounded-xl border border-input bg-surface px-3 text-base outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            {...stylex.props(styles.select)}
           >
             {ROLES.map((role) => (
               <option key={role} value={role}>
@@ -133,29 +147,21 @@ export function UserForm({
         </div>
 
         <div>
-          <Label htmlFor="user-team" className="text-sm text-muted">
-            {t("userForm.team")}
-          </Label>
+          <Label htmlFor="user-team">{t("userForm.team")}</Label>
           <Input
             id="user-team"
             name="team"
             value={draft.team}
             onChange={(e) => set({ team: e.target.value })}
-            className={FIELD}
+            sx={styles.field}
           />
         </div>
 
-        <div className="mt-2 flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            data-testid="user-cancel"
-            onClick={onCancel}
-            className="rounded-xl px-5"
-          >
+        <div {...stylex.props(styles.actions)}>
+          <Button variant="outline" data-testid="user-cancel" onClick={onCancel}>
             {t("common.cancel")}
           </Button>
-          <Button type="submit" data-testid="user-save" className="rounded-xl px-5">
+          <Button type="submit" data-testid="user-save">
             {user ? t("userForm.save") : t("userForm.create")}
           </Button>
         </div>

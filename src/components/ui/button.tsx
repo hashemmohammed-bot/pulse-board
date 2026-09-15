@@ -1,63 +1,68 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "cn"
-import { Slot } from "radix-ui"
+import type { ComponentProps } from "react";
+import * as stylex from "@stylexjs/stylex";
+import { colors, radius } from "@/styles/tokens.stylex";
 
-const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
-        outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-8 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9",
-        "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm": "size-8",
-        "icon-lg": "size-10",
-      },
+const styles = stylex.create({
+  base: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",
+    whiteSpace: "nowrap",
+    fontFamily: "inherit",
+    fontWeight: 600,
+    borderRadius: radius.md,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "transparent",
+    cursor: "pointer",
+    transitionProperty: "background-color, color, border-color",
+    transitionDuration: "150ms",
+    outline: {
+      default: "none",
+      ":focus-visible": `2px solid ${colors.brand500}`,
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-)
+    outlineOffset: "2px",
+  },
+  default: {
+    backgroundColor: { default: colors.brand600, ":hover": colors.brand500 },
+    color: colors.onAccent,
+  },
+  outline: {
+    backgroundColor: { default: colors.surface, ":hover": colors.canvas },
+    color: colors.ink,
+    borderColor: colors.line,
+  },
+  destructive: {
+    backgroundColor: colors.bad,
+    color: colors.onAccent,
+    opacity: { default: 1, ":hover": 0.9 },
+  },
+  ghost: {
+    backgroundColor: { default: "transparent", ":hover": colors.canvas },
+    color: colors.muted,
+  },
+  md: { paddingBlock: "10px", paddingInline: "20px", fontSize: "16px" },
+  sm: { paddingBlock: "6px", paddingInline: "12px", fontSize: "14px" },
+  icon: { height: "40px", width: "40px", padding: 0, fontSize: "18px", flexShrink: 0 },
+});
 
-function Button({
-  className,
-  variant = "default",
-  size = "default",
-  asChild = false,
-  ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }) {
-  const Comp = asChild ? Slot.Root : "button"
+export type ButtonVariant = "default" | "outline" | "destructive" | "ghost";
+export type ButtonSize = "md" | "sm" | "icon";
 
+export type ButtonProps = Omit<ComponentProps<"button">, "style" | "className"> & {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  /** Extra StyleX styles from the call site. */
+  sx?: stylex.StyleXStyles;
+};
+
+export function Button({ variant = "default", size = "md", sx, type = "button", ...props }: ButtonProps) {
   return (
-    <Comp
-      data-slot="button"
-      data-variant={variant}
-      data-size={size}
-      className={cn(buttonVariants({ variant, size, className }))}
+    <button
+      type={type}
       {...props}
+      {...stylex.props(styles.base, styles[variant], styles[size], sx)}
     />
-  )
+  );
 }
-
-export { Button, buttonVariants }

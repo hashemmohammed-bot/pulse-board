@@ -1,115 +1,58 @@
-"use client"
+import type { ComponentProps } from "react";
+import * as stylex from "@stylexjs/stylex";
+import { colors } from "@/styles/tokens.stylex";
 
-import * as React from "react"
-import { cn } from "cn"
+const styles = stylex.create({
+  scroller: { width: "100%", overflowX: "auto" },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    textAlign: "left",
+    fontSize: "16px",
+    color: colors.ink,
+  },
+  headRow: { borderBottomWidth: "1px", borderBottomStyle: "solid", borderBottomColor: colors.line },
+  row: {
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+  },
+  head: { paddingBlock: "12px", fontSize: "14px", fontWeight: 500, color: colors.muted },
+  cell: { paddingBlock: "14px" },
+});
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+type Sx = { sx?: stylex.StyleXStyles };
+type Clean<T extends keyof React.JSX.IntrinsicElements> = Omit<
+  ComponentProps<T>,
+  "style" | "className"
+> &
+  Sx;
+
+/** The scroll container is a wrapper; the testid goes on the <table> itself. */
+export function Table({ sx, ...props }: Clean<"table">) {
   return (
-    <div
-      data-slot="table-container"
-      className="relative w-full overflow-x-auto"
-    >
-      <table
-        data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-      />
+    <div {...stylex.props(styles.scroller)}>
+      <table {...props} {...stylex.props(styles.table, sx)} />
     </div>
-  )
+  );
 }
 
-function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
-  return (
-    <thead
-      data-slot="table-header"
-      className={cn("[&_tr]:border-b", className)}
-      {...props}
-    />
-  )
+export function TableHeader({ sx, ...props }: Clean<"thead">) {
+  return <thead {...props} {...stylex.props(sx)} />;
 }
 
-function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
-  return (
-    <tbody
-      data-slot="table-body"
-      className={cn("[&_tr:last-child]:border-0", className)}
-      {...props}
-    />
-  )
+export function TableBody({ sx, ...props }: Clean<"tbody">) {
+  return <tbody {...props} {...stylex.props(sx)} />;
 }
 
-function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
-  return (
-    <tfoot
-      data-slot="table-footer"
-      className={cn(
-        "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
-        className
-      )}
-      {...props}
-    />
-  )
+export function TableRow({ sx, head, ...props }: Clean<"tr"> & { head?: boolean }) {
+  return <tr {...props} {...stylex.props(head ? styles.headRow : styles.row, sx)} />;
 }
 
-function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
-  return (
-    <tr
-      data-slot="table-row"
-      className={cn(
-        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
-        className
-      )}
-      {...props}
-    />
-  )
+export function TableHead({ sx, ...props }: Clean<"th">) {
+  return <th scope="col" {...props} {...stylex.props(styles.head, sx)} />;
 }
 
-function TableHead({ className, ...props }: React.ComponentProps<"th">) {
-  return (
-    <th
-      data-slot="table-head"
-      className={cn(
-        "h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function TableCell({ className, ...props }: React.ComponentProps<"td">) {
-  return (
-    <td
-      data-slot="table-cell"
-      className={cn(
-        "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function TableCaption({
-  className,
-  ...props
-}: React.ComponentProps<"caption">) {
-  return (
-    <caption
-      data-slot="table-caption"
-      className={cn("mt-4 text-sm text-muted-foreground", className)}
-      {...props}
-    />
-  )
-}
-
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableFooter,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableCaption,
+export function TableCell({ sx, ...props }: Clean<"td">) {
+  return <td {...props} {...stylex.props(styles.cell, sx)} />;
 }
