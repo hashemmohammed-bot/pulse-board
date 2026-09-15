@@ -106,10 +106,23 @@ export default function App() {
     applyTheme(next);
   }
 
-  // The theme variables are applied here, above everything else, so the login
-  // screen, the router and every portalled dialog resolve the same palette.
+  const themeProps = stylex.props(theme === "dark" ? darkTheme : lightTheme);
+
+  /*
+   * The theme goes on <html>, not on a wrapper element. Radix portals dialogs to
+   * document.body, so anything scoped to a wrapper would leave them resolving the
+   * token defaults instead — which follow prefers-color-scheme, and so rendered a
+   * dark dialog over a light app on a dark-mode machine.
+   */
+  useEffect(() => {
+    const root = document.documentElement;
+    const classNames = themeProps.className?.split(" ").filter(Boolean) ?? [];
+    root.classList.add(...classNames);
+    return () => root.classList.remove(...classNames);
+  }, [themeProps.className]);
+
   const themed = (children: ReactNode) => (
-    <div {...stylex.props(theme === "dark" ? darkTheme : lightTheme, styles.root)}>{children}</div>
+    <div {...stylex.props(styles.root)}>{children}</div>
   );
 
   if (!session && (AUTH_REQUIRED || loginForced())) {
