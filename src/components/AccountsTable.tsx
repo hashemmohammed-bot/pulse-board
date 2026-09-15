@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { colors } from "@/styles/tokens.stylex";
 import { card, cardSubtitle, cardTitle, numeric, pr, right, sectionHead } from "@/styles/shared";
+import { useDataLabel } from "@/i18n/labels";
 
 type SortKey = "name" | "plan" | "region" | "owner" | "mrr" | "seats" | "status" | "health";
 type SortState = { key: SortKey; dir: "asc" | "desc" } | null;
@@ -71,6 +72,7 @@ export function AccountsTable({
   onSelect: (account: Account) => void;
 }) {
   const { t } = useTranslation();
+  const label = useDataLabel();
   const [query, setQuery] = useState("");
   // Starts unsorted so the first click on a header sorts ascending.
   const [sort, setSort] = useState<SortState>(null);
@@ -166,7 +168,7 @@ export function AccountsTable({
                 sx={styles.row}
               >
                 <TableCell sx={[pr, styles.name]}>{a.name}</TableCell>
-                <TableCell sx={pr}>{a.plan}</TableCell>
+                <TableCell sx={pr}>{label("plan", a.plan)}</TableCell>
                 <TableCell sx={pr}>{a.region}</TableCell>
                 <TableCell sx={pr}>{a.owner}</TableCell>
                 <TableCell data-testid="cell-mrr" sx={[pr, numeric]}>
@@ -174,7 +176,7 @@ export function AccountsTable({
                 </TableCell>
                 <TableCell sx={[pr, numeric]}>{a.seats}</TableCell>
                 <TableCell sx={pr}>
-                  <StatusBadge label={a.status} />
+                  <StatusBadge status={a.status} />
                 </TableCell>
                 <TableCell sx={right}>
                   <HealthBar score={a.health} />

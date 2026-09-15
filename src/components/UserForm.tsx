@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { colors, radius } from "@/styles/tokens.stylex";
+import { useDataLabel } from "@/i18n/labels";
 
 const ROLES: UserRole[] = ["Admin", "Manager", "Viewer"];
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -53,6 +54,7 @@ export function UserForm({
   onCancel: () => void;
 }) {
   const { t } = useTranslation();
+  const label = useDataLabel();
   const [draft, setDraft] = useState<UserDraft>({
     name: user?.name ?? "",
     email: user?.email ?? "",
@@ -139,8 +141,9 @@ export function UserForm({
             {...stylex.props(styles.select)}
           >
             {ROLES.map((role) => (
+              // The value stays the dataset spelling; only the text is translated.
               <option key={role} value={role}>
-                {role}
+                {label("role", role)}
               </option>
             ))}
           </select>

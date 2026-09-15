@@ -1,11 +1,9 @@
 import { Badge, type BadgeTone } from "@/components/ui/badge";
+import { useDataLabel } from "@/i18n/labels";
 
-/**
- * Maps an account or user status onto a badge tone. The label itself is never
- * translated: it comes from the dataset and the acceptance test matches on it.
- */
-function toneFor(label: string): BadgeTone {
-  switch (label) {
+/** Tone is chosen from the raw dataset value; only the display text is translated. */
+function toneFor(status: string): BadgeTone {
+  switch (status) {
     case "Active":
       return "success";
     case "Trial":
@@ -21,6 +19,7 @@ function toneFor(label: string): BadgeTone {
   }
 }
 
-export function StatusBadge({ label }: { label: string }) {
-  return <Badge tone={toneFor(label)}>{label}</Badge>;
+export function StatusBadge({ status }: { status: string }) {
+  const label = useDataLabel();
+  return <Badge tone={toneFor(status)}>{label("status", status)}</Badge>;
 }

@@ -3,6 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { Kpi } from "@/types";
 import { delta, isGoodDelta, kpiValue } from "@/format";
 import { colors, radius } from "@/styles/tokens.stylex";
+import { useDataLabel } from "@/i18n/labels";
 
 const styles = stylex.create({
   row: {
@@ -40,6 +41,7 @@ const styles = stylex.create({
 
 export function KpiRow({ kpis }: { kpis: Kpi[] }) {
   const { t } = useTranslation();
+  const label = useDataLabel();
 
   return (
     <section data-testid="kpi-row" aria-label={t("kpi.rowLabel")} {...stylex.props(styles.row)}>
@@ -47,8 +49,8 @@ export function KpiRow({ kpis }: { kpis: Kpi[] }) {
         const good = isGoodDelta(kpi);
         return (
           <article key={kpi.id} data-testid="kpi-card" {...stylex.props(styles.card)}>
-            {/* The label comes from the dataset and is deliberately not translated. */}
-            <p {...stylex.props(styles.label)}>{kpi.label}</p>
+            {/* Dataset label, translated by id; unknown ids fall back to the raw label. */}
+            <p {...stylex.props(styles.label)}>{label("kpi", kpi.id)}</p>
             <p {...stylex.props(styles.value)}>{kpiValue(kpi)}</p>
             <p {...stylex.props(styles.deltaRow)}>
               <span {...stylex.props(good ? styles.good : styles.bad)}>

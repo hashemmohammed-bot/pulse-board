@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import * as stylex from "@stylexjs/stylex";
 import {
   Dialog,
@@ -31,6 +32,8 @@ interface ModalProps {
  * with onClose wired to Radix's dismiss events.
  */
 export function Modal({ eyebrow, title, onClose, testId, closeTestId, children }: ModalProps) {
+  const { t } = useTranslation();
+
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent data-testid={testId} aria-label={title}>
@@ -44,7 +47,7 @@ export function Modal({ eyebrow, title, onClose, testId, closeTestId, children }
               variant="outline"
               size="icon"
               data-testid={closeTestId}
-              aria-label="Close"
+              aria-label={t("common.close")}
               sx={styles.close}
             >
               <span aria-hidden="true">&#10005;</span>

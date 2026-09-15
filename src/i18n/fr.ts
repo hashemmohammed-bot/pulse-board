@@ -112,4 +112,30 @@ export const fr: Translations = {
       email: "Saisissez une adresse e-mail valide.",
     },
   },
+  data: {
+    kpi: {
+      mrr: "Revenu récurrent mensuel",
+      "active-accounts": "Comptes actifs",
+      "churn-rate": "Taux d’attrition",
+      nps: "Net promoter score",
+    },
+    status: {
+      Active: "Actif",
+      Trial: "Essai",
+      "At risk": "À risque",
+      Churned: "Perdu",
+      Invited: "Invité",
+      Suspended: "Suspendu",
+    },
+    plan: {
+      Starter: "Découverte",
+      Growth: "Croissance",
+      Enterprise: "Entreprise",
+    },
+    role: {
+      Admin: "Administrateur",
+      Manager: "Gestionnaire",
+      Viewer: "Lecteur",
+    },
+  },
 };

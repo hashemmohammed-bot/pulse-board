@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { colors, radius } from "@/styles/tokens.stylex";
 import { card, cardSubtitle, cardTitle, muted, pr, right, sectionHead } from "@/styles/shared";
+import { useDataLabel } from "@/i18n/labels";
 
 /** null = the form is closed; "new" = creating; a User = editing that user. */
 type FormState = null | "new" | User;
@@ -50,6 +51,7 @@ const styles = stylex.create({
 export function Users() {
   const { t, i18n } = useTranslation();
   const { users, setUsers } = useAppState();
+  const label = useDataLabel();
   const [form, setForm] = useState<FormState>(null);
   const [pendingDelete, setPendingDelete] = useState<User | null>(null);
   const locale = dateLocale(i18n.resolvedLanguage ?? "en");
@@ -119,10 +121,10 @@ export function Users() {
                     </span>
                   </TableCell>
                   <TableCell sx={pr}>{u.email}</TableCell>
-                  <TableCell sx={pr}>{u.role}</TableCell>
+                  <TableCell sx={pr}>{label("role", u.role)}</TableCell>
                   <TableCell sx={pr}>{u.team}</TableCell>
                   <TableCell sx={pr}>
-                    <StatusBadge label={u.status} />
+                    <StatusBadge status={u.status} />
                   </TableCell>
                   <TableCell sx={[pr, muted]}>{formatDate(u.lastLoginAt, locale)}</TableCell>
                   <TableCell sx={styles.actions}>

@@ -76,9 +76,17 @@ Delta colour follows `higherIsBetter`: green when the change is good news, red w
   twice in `vite.config.ts`: once in `resolve.alias` for Vite, once in the plugin's `aliases`
   option. Adding an alias to only one of them fails the build.
 - **i18n**: copy lives in `src/i18n/en.ts` and `fr.ts`; `fr` is typed against `en`, so a
-  missing French key is a type error. Values that come from the dataset — status, role, plan,
-  region, names — are **never** translated; the acceptance test matches them literally.
-  Currency and percentages stay en-US for the same reason. Dates follow the active language.
+  missing French key is a type error.
+- **Dataset values split in two.** Closed enumerations — KPI label (by id), account and user
+  status, plan, role — are translated through `useDataLabel()` in `src/i18n/labels.ts`, whose
+  English entries must match `data.json` **exactly** because the acceptance test runs in
+  English and matches them literally. Free text (names, emails, teams, notes) and region codes
+  (NA/EMEA/APAC/LATAM) pass through untranslated, and `useDataLabel` falls back to the raw
+  value so a team a user typed is never mangled.
+- The role `<option>` keeps its English `value` and translates only its text: the test's
+  `selectOption("Viewer")` matches on the value.
+- Currency and percentages stay en-US in both languages — the spec fixes those formats and the
+  test parses them. Dates follow the active language.
 - **Recharts**: keep the chart wrapper at a fixed height — a zero-height parent makes
   ResponsiveContainer log warnings, which fails rule 1.
 - **The role field must stay a native `<select>`**. The test drives it with `selectOption()`,

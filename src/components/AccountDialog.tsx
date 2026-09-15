@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { HealthBar } from "@/components/HealthBar";
 import { Modal } from "@/components/Modal";
 import { colors } from "@/styles/tokens.stylex";
+import { useDataLabel } from "@/i18n/labels";
 
 const styles = stylex.create({
   grid: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "24px", margin: 0 },
@@ -33,6 +34,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 export function AccountDialog({ account, onClose }: { account: Account; onClose: () => void }) {
   const { t, i18n } = useTranslation();
   const locale = dateLocale(i18n.resolvedLanguage ?? "en");
+  const label = useDataLabel();
 
   return (
     <Modal
@@ -43,12 +45,12 @@ export function AccountDialog({ account, onClose }: { account: Account; onClose:
       closeTestId="drawer-close"
     >
       <dl {...stylex.props(styles.grid)}>
-        <Field label={t("accounts.columns.plan")}>{account.plan}</Field>
+        <Field label={t("accounts.columns.plan")}>{label("plan", account.plan)}</Field>
         <Field label={t("accounts.columns.region")}>{account.region}</Field>
         <Field label={t("accounts.columns.mrr")}>{currency(account.mrr)}</Field>
         <Field label={t("accounts.columns.seats")}>{account.seats}</Field>
         <Field label={t("accounts.columns.status")}>
-          <StatusBadge label={account.status} />
+          <StatusBadge status={account.status} />
         </Field>
         <Field label={t("accounts.columns.health")}>
           <HealthBar score={account.health} width={80} />

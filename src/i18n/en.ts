@@ -116,6 +116,40 @@ export const en = {
       email: "Enter a valid email address.",
     },
   },
+  /**
+   * Values that arrive from the dataset but read as UI copy. Free text (names,
+   * emails, teams, notes) and region codes are deliberately absent: they pass
+   * through untranslated.
+   *
+   * The English entries must match data.json exactly — the acceptance test runs
+   * in English and matches these strings literally.
+   */
+  data: {
+    kpi: {
+      mrr: "Monthly recurring revenue",
+      "active-accounts": "Active accounts",
+      "churn-rate": "Churn rate",
+      nps: "Net promoter score",
+    },
+    status: {
+      Active: "Active",
+      Trial: "Trial",
+      "At risk": "At risk",
+      Churned: "Churned",
+      Invited: "Invited",
+      Suspended: "Suspended",
+    },
+    plan: {
+      Starter: "Starter",
+      Growth: "Growth",
+      Enterprise: "Enterprise",
+    },
+    role: {
+      Admin: "Admin",
+      Manager: "Manager",
+      Viewer: "Viewer",
+    },
+  },
 } as const;
 
 /** Same shape as `en`, but every leaf widened to string — the contract fr.ts implements. */
