@@ -99,3 +99,23 @@ right-hand drawers — the centred treatment is a deliberate departure, not drif
 Their testids are still `detail-drawer` and `drawer-close`: the acceptance test hard-codes
 those strings, so the names are historical and say nothing about the layout. Renaming them
 fails the suite.
+
+## Authentication
+
+Both pages sit behind a sign-in screen. It is a **mock**: the credential is compared in the
+browser and the session is a string in `localStorage` (`pulseboard.session.v1`). It provides
+no security at all — anyone can read the credential out of the bundle or write the storage
+key by hand. Do not copy this shape into anything real.
+
+- Demo credential: `root` / `root` (shown on the screen itself).
+- `VITE_REQUIRE_AUTH=false` disables the gate. It is on in every other case.
+- `playwright.config.ts` starts its dev server with that variable set, because
+  `acceptance.spec.ts` expects the dashboard immediately on load and cannot be edited.
+- `?login=1` forces the login screen even when the gate is off — that is how the login
+  screenshot and `tests/auth.spec.ts` reach it.
+
+**Ordering trap:** `reuseExistingServer` is on. A dev server already running with the gate
+enabled gets reused by Playwright, and all 13 acceptance tests then stop at the login screen.
+Stop your dev server before `npm test`.
+
+Run `npm run test:auth` for the sign-in tests (not part of the acceptance contract).

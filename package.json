@@ -12,7 +12,8 @@
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "screenshot": "playwright test tests/screenshot.spec.ts",
-    "playwright:install": "playwright install chromium"
+    "playwright:install": "playwright install chromium",
+    "test:auth": "playwright test tests/auth.spec.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

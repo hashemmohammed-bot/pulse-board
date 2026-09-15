@@ -19,6 +19,14 @@ for (const vp of viewports) {
   });
 }
 
+test("screenshot login-1280x800", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  // The gate is disabled for tests, so ask for the screen explicitly.
+  await page.goto("/?login=1");
+  await page.getByTestId("login-form").waitFor();
+  await page.screenshot({ path: "screenshots/login-1280x800.png" });
+});
+
 test("screenshot desktop-dialog-1280x800", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");

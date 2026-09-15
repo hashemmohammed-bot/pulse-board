@@ -24,6 +24,16 @@ export default defineConfig({
     command: "npm run dev",
     url: "http://localhost:5173",
     reuseExistingServer: true,
+    /**
+     * The app requires sign-in by default, but acceptance.spec.ts expects the
+     * dashboard immediately on load and must not be edited — so the server the
+     * tests start runs with the gate off.
+     *
+     * Because reuseExistingServer is on, a dev server that is ALREADY running
+     * (with the gate on) is reused as-is and every test then stops at the login
+     * screen. Stop your dev server before running npm test.
+     */
+    env: { VITE_REQUIRE_AUTH: "false" },
     timeout: 60_000,
   },
 });

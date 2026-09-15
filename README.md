@@ -43,3 +43,10 @@ design/               reference designs: dashboard and users page, desktop and m
 tests/acceptance.spec.ts   acceptance test (do not edit; judges run it as-is)
 tests/screenshot.spec.ts   screenshot helper
 ```
+
+## Signing in
+
+The app requires sign-in: use **`root` / `root`**. This is a browser-side mock with no
+security value. Set `VITE_REQUIRE_AUTH=false` to disable the gate; `npm test` does this
+automatically, but stop any dev server you already have running first, or Playwright will
+reuse it and every test will stop at the login screen.

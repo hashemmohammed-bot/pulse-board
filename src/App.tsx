@@ -2,7 +2,17 @@ import { useEffect, useState } from "react";
 import type { DashboardData, User } from "./types";
 import { Dashboard } from "./pages/Dashboard";
 import { Users } from "./pages/Users";
+import { Login } from "./pages/Login";
 import { applyTheme, storedTheme, systemTheme, type Theme } from "./theme";
+import { AUTH_REQUIRED, endSession, readSession, startSession } from "./auth";
+
+/**
+ * The gate is off in the acceptance run, so `?login=1` forces the screen to
+ * render anyway — that is how the login screenshot is captured.
+ */
+function loginForced() {
+  return new URLSearchParams(window.location.search).has("login");
+}
 
 type Page = "dashboard" | "users";
 
@@ -41,6 +51,7 @@ export default function App() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [page, setPage] = useState<Page>("dashboard");
   const [theme, setTheme] = useState<Theme>(() => storedTheme() ?? systemTheme());
+  const [session, setSession] = useState<string | null>(() => readSession());
 
   function toggleTheme() {
     const next: Theme = theme === "dark" ? "light" : "dark";
@@ -68,6 +79,17 @@ export default function App() {
     };
   }, []);
 
+  if (!session && (AUTH_REQUIRED || loginForced())) {
+    return (
+      <Login
+        onSignedIn={(username) => {
+          startSession(username);
+          setSession(username);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-canvas">
       <header className="flex flex-wrap items-center gap-6 px-6 py-5 sm:px-8">
@@ -91,17 +113,37 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <button
-          type="button"
-          data-testid="theme-toggle"
-          onClick={toggleTheme}
-          aria-pressed={theme === "dark"}
-          aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-          title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-          className="ml-auto grid h-10 w-10 place-items-center rounded-xl border border-line bg-surface text-lg transition hover:bg-canvas focus-visible:outline-2 focus-visible:outline-brand-600"
-        >
-          <span aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
-        </button>
+        <div className="ml-auto flex items-center gap-3">
+          <button
+            type="button"
+            data-testid="theme-toggle"
+            onClick={toggleTheme}
+            aria-pressed={theme === "dark"}
+            aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            className="grid h-10 w-10 place-items-center rounded-xl border border-line bg-surface text-lg transition hover:bg-canvas focus-visible:outline-2 focus-visible:outline-brand-600"
+          >
+            <span aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
+          </button>
+          {session && (
+            <>
+              <span data-testid="session-user" className="hidden text-sm text-muted sm:inline">
+                Signed in as <span className="font-semibold text-ink">{session}</span>
+              </span>
+              <button
+                type="button"
+                data-testid="logout"
+                onClick={() => {
+                  endSession();
+                  setSession(null);
+                }}
+                className="rounded-xl border border-line bg-surface px-4 py-2 text-sm font-semibold transition hover:bg-canvas"
+              >
+                Sign out
+              </button>
+            </>
+          )}
+        </div>
       </header>
 
       <main className="px-6 pb-12 sm:px-8">

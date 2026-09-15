@@ -1,0 +1,99 @@
+import { useState } from "react";
+import { DEMO_HINT, verifyCredentials } from "../auth";
+
+type FieldError = { field: "email" | "password"; message: string } | null;
+
+const FIELD =
+  "mt-1.5 w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-base outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
+
+export function Login({ onSignedIn }: { onSignedIn: (username: string) => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  // Rendered only after a failed submit, so login-error is absent until then.
+  const [error, setError] = useState<FieldError>(null);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) {
+      setError({ field: "email", message: "Enter your email." });
+      return;
+    }
+    if (!password) {
+      setError({ field: "password", message: "Enter your password." });
+      return;
+    }
+    if (!verifyCredentials(email, password)) {
+      setError({ field: "password", message: "Incorrect email or password." });
+      return;
+    }
+    setError(null);
+    onSignedIn(email.trim());
+  }
+
+  const ring = (field: "email" | "password") =>
+    error?.field === field ? " border-bad ring-2 ring-bad-soft" : "";
+
+  return (
+    <main className="grid min-h-screen place-items-center bg-canvas p-4">
+      <div className="w-full max-w-[420px] rounded-2xl border border-line bg-surface px-8 py-9">
+        <div className="flex items-center gap-3">
+          <span className="h-9 w-9 rounded-xl bg-brand-500" aria-hidden="true" />
+          <h1 className="text-2xl font-bold tracking-tight">PulseBoard</h1>
+        </div>
+        <p className="mt-6 text-lg font-semibold">Sign in</p>
+        <p className="mt-1 text-sm text-muted">Use your PulseBoard account to continue.</p>
+
+        <form data-testid="login-form" onSubmit={handleSubmit} noValidate className="mt-6 flex flex-col gap-5">
+          <div>
+            <label htmlFor="login-email" className="text-sm text-muted">
+              Email
+            </label>
+            <input
+              id="login-email"
+              name="email"
+              type="text"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={FIELD + ring("email")}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="login-password" className="text-sm text-muted">
+              Password
+            </label>
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={FIELD + ring("password")}
+            />
+          </div>
+
+          {error && (
+            <p data-testid="login-error" role="alert" className="-mt-2 text-sm text-bad">
+              {error.message}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            data-testid="login-submit"
+            className="mt-1 rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-on-accent transition hover:bg-brand-500"
+          >
+            Sign in
+          </button>
+        </form>
+
+        <p className="mt-6 rounded-xl bg-canvas px-4 py-3 text-sm text-muted">
+          Demo build — sign in with <span className="font-semibold text-ink">{DEMO_HINT}</span>. The
+          credential is checked in the browser and grants no real access.
+        </p>
+      </div>
+    </main>
+  );
+}
