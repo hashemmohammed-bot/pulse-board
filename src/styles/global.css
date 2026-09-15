@@ -13,7 +13,12 @@
 html {
   background: #eceef4;
   color: #16181d;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   color-scheme: light;
 }
 

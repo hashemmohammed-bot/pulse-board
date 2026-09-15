@@ -156,5 +156,9 @@ export const en = {
 export type Translations = {
   [K in keyof typeof en]: (typeof en)[K] extends string
     ? string
-    : { [J in keyof (typeof en)[K]]: (typeof en)[K][J] extends string ? string : Record<string, string> };
+    : {
+        [J in keyof (typeof en)[K]]: (typeof en)[K][J] extends string
+          ? string
+          : Record<string, string>;
+      };
 };

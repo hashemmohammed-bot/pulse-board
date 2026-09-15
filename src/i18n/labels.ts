@@ -11,6 +11,5 @@ export type DataGroup = "kpi" | "status" | "plan" | "role";
  */
 export function useDataLabel() {
   const { t } = useTranslation();
-  return (group: DataGroup, value: string) =>
-    t(`data.${group}.${value}`, { defaultValue: value });
+  return (group: DataGroup, value: string) => t(`data.${group}.${value}`, { defaultValue: value });
 }

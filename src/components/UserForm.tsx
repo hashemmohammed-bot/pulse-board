@@ -99,7 +99,12 @@ export function UserForm({
       onClose={onCancel}
       testId="user-dialog"
     >
-      <form data-testid="user-form" onSubmit={handleSubmit} noValidate {...stylex.props(styles.form)}>
+      <form
+        data-testid="user-form"
+        onSubmit={handleSubmit}
+        noValidate
+        {...stylex.props(styles.form)}
+      >
         <div>
           <Label htmlFor="user-name">{t("userForm.name")}</Label>
           <Input

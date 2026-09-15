@@ -17,9 +17,20 @@ import { colors, radius } from "@/styles/tokens.stylex";
 import { card, cardSubtitle, cardTitle } from "@/styles/shared";
 
 const styles = stylex.create({
-  legend: { display: "flex", alignItems: "center", gap: "24px", marginTop: "16px", fontSize: "14px" },
+  legend: {
+    display: "flex",
+    alignItems: "center",
+    gap: "24px",
+    marginTop: "16px",
+    fontSize: "14px",
+  },
   legendItem: { display: "flex", alignItems: "center", gap: "8px" },
-  swatchBar: { height: "12px", width: "12px", borderRadius: "3px", backgroundColor: colors.brand500 },
+  swatchBar: {
+    height: "12px",
+    width: "12px",
+    borderRadius: "3px",
+    backgroundColor: colors.brand500,
+  },
   swatchLine: {
     height: "12px",
     width: "12px",

@@ -27,14 +27,5 @@ const shared = stylex.create({
   pr: { paddingRight: "16px" },
 });
 
-export const {
-  card,
-  cardTitle,
-  cardSubtitle,
-  sectionHead,
-  stack,
-  muted,
-  numeric,
-  right,
-  pr,
-} = shared;
+export const { card, cardTitle, cardSubtitle, sectionHead, stack, muted, numeric, right, pr } =
+  shared;

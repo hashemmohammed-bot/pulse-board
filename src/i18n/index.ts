@@ -29,6 +29,18 @@ i18n
     },
   });
 
+/**
+ * Keep `<html lang>` in step with the active language. Without this the document
+ * stays lang="en" in French, which mis-cues screen reader pronunciation, `:lang()`
+ * rules and browser translation prompts.
+ */
+function syncDocumentLanguage(language: string) {
+  document.documentElement.lang = language.split("-")[0];
+}
+
+syncDocumentLanguage(i18n.resolvedLanguage ?? "en");
+i18n.on("languageChanged", syncDocumentLanguage);
+
 /** Dates follow the active language; currency and percentages do not. */
 export function dateLocale(language: string): string {
   return language.startsWith("fr") ? "fr-FR" : "en-US";

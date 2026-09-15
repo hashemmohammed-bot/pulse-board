@@ -8,15 +8,18 @@ Playwright for tests. There is no Tailwind and no shadcn/ui in this project.
 - `npm test` — acceptance tests (starts their own server on :5174)
 - `npm run test:auth` — sign-in tests
 - `npm run typecheck` — tsc
+- `npm run lint` / `npm run lint:fix` — oxlint
+- `npm run format` / `npm run format:check` — oxfmt
+- `npm run test:all` — acceptance + sign-in + regression suites
 - `npm run screenshot` — writes desktop/tablet/mobile PNGs to `screenshots/`
 
 ## Sources of truth
 
-| What | Where |
-| --- | --- |
-| Brief | `SPEC.md` |
-| Target UI | `design/*.png` |
-| Data | `public/data.json`, types in `src/types.ts` |
+| What               | Where                                                            |
+| ------------------ | ---------------------------------------------------------------- |
+| Brief              | `SPEC.md`                                                        |
+| Target UI          | `design/*.png`                                                   |
+| Data               | `public/data.json`, types in `src/types.ts`                      |
 | Definition of done | `tests/acceptance.spec.ts` — **never edit**, judges run it as-is |
 
 ## Acceptance rules that are easy to break
@@ -50,12 +53,12 @@ These come from reading `tests/acceptance.spec.ts`. Violating any one fails a te
 
 ## Formatting
 
-| Kind | Example | Rule |
-| --- | --- | --- |
-| currency | `$85,370` | `"$" + Math.round(n).toLocaleString("en-US")` — no cents |
-| percent | `3.2%` | `(n * 100).toFixed(1) + "%"` |
-| delta | `+5.5%` / `-0.4%` | signed, one decimal |
-| number / score | `15`, `47` | plain |
+| Kind           | Example           | Rule                                                     |
+| -------------- | ----------------- | -------------------------------------------------------- |
+| currency       | `$85,370`         | `"$" + Math.round(n).toLocaleString("en-US")` — no cents |
+| percent        | `3.2%`            | `(n * 100).toFixed(1) + "%"`                             |
+| delta          | `+5.5%` / `-0.4%` | signed, one decimal                                      |
+| number / score | `15`, `47`        | plain                                                    |
 
 Delta colour follows `higherIsBetter`: green when the change is good news, red when it is bad.
 
@@ -152,3 +155,28 @@ port and reused whatever was running — which meant a dev server started with t
 all 13 tests to the login screen.
 
 Run `npm run test:auth` for the sign-in tests (not part of the acceptance contract).
+
+## Tooling
+
+oxlint and oxfmt (the oxc toolchain) replace the usual ESLint/Prettier pair. Both skip
+`tests/acceptance.spec.ts`: it is the judged contract and must not be reformatted or edited.
+
+Rules switched off in `.oxlintrc.json`, and why — none of them found a real defect here:
+
+| Rule                                        | Reason                                                                                                                                                       |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `react/react-in-jsx-scope`                  | The project uses the automatic JSX runtime.                                                                                                                  |
+| `jsx-a11y/prefer-tag-over-role`             | Suggests `<img>` for the chart wrapper, where `role="img"` + `aria-label` is the correct pattern for inline SVG, and `<fieldset>` for the language switcher. |
+| `import/no-named-as-default-member`         | False positives on `i18n.use()` and `stylex.vite()`.                                                                                                         |
+| `import/no-unassigned-import`               | The CSS and i18n bootstrap imports are side-effect imports on purpose.                                                                                       |
+| `unicorn/no-array-sort`, `no-array-reverse` | The table already copies before sorting; `toSorted` would need `lib: ES2023`.                                                                                |
+
+`src/components/ui/label.tsx` carries the only inline suppression: the rule cannot see that
+every call site passes `htmlFor`.
+
+## Regression tests
+
+`tests/regression.spec.ts` (in `npm run test:all`) guards three fixes that are invisible in
+the acceptance suite: `<html lang>` following the language switch, a corrupt `localStorage`
+entry falling back to the shipped dataset, and creating a user on a page where
+`crypto.randomUUID` is unavailable — which is any plain-http LAN address.

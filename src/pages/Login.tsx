@@ -32,7 +32,12 @@ const styles = stylex.create({
   },
   top: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" },
   brand: { display: "flex", alignItems: "center", gap: "12px" },
-  logo: { height: "36px", width: "36px", borderRadius: radius.md, backgroundColor: colors.brand500 },
+  logo: {
+    height: "36px",
+    width: "36px",
+    borderRadius: radius.md,
+    backgroundColor: colors.brand500,
+  },
   title: { margin: 0, fontSize: "24px", fontWeight: 700, letterSpacing: "-0.02em" },
   langGroup: {
     display: "flex",

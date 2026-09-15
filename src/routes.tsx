@@ -19,7 +19,12 @@ const styles = stylex.create({
     paddingBlock: "20px",
   },
   brand: { display: "flex", alignItems: "center", gap: "12px" },
-  logo: { height: "36px", width: "36px", borderRadius: radius.md, backgroundColor: colors.brand500 },
+  logo: {
+    height: "36px",
+    width: "36px",
+    borderRadius: radius.md,
+    backgroundColor: colors.brand500,
+  },
   title: { margin: 0, fontSize: "24px", fontWeight: 700, letterSpacing: "-0.02em" },
   nav: { display: "flex", alignItems: "center", gap: "4px" },
   navLink: {
@@ -139,8 +144,7 @@ function Layout() {
           {session && (
             <>
               <span data-testid="session-user" {...stylex.props(styles.session)}>
-                {t("auth.signedInAs")}{" "}
-                <span {...stylex.props(styles.sessionName)}>{session}</span>
+                {t("auth.signedInAs")} <span {...stylex.props(styles.sessionName)}>{session}</span>
               </span>
               <Button variant="outline" data-testid="logout" onClick={signOut}>
                 {t("auth.signOut")}

@@ -20,6 +20,7 @@ import {
 import { colors, radius } from "@/styles/tokens.stylex";
 import { card, cardSubtitle, cardTitle, muted, pr, right, sectionHead } from "@/styles/shared";
 import { useDataLabel } from "@/i18n/labels";
+import { newId } from "@/id";
 
 /** null = the form is closed; "new" = creating; a User = editing that user. */
 type FormState = null | "new" | User;
@@ -64,7 +65,7 @@ export function Users() {
       setUsers([
         ...users,
         {
-          id: `usr-${crypto.randomUUID().slice(0, 8)}`,
+          id: newId("usr"),
           ...draft,
           status: "Invited",
           createdAt: new Date().toISOString().slice(0, 10),

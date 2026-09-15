@@ -1,0 +1,4 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": ["tests/acceptance.spec.ts", "SPEC.md", "design/README.md", "public/data.json"]
+}

@@ -15,5 +15,7 @@ export type LabelProps = Omit<ComponentProps<"label">, "style" | "className"> & 
 };
 
 export function Label({ sx, ...props }: LabelProps) {
+  // This is the generic primitive; every call site passes htmlFor, which the rule cannot see.
+  // oxlint-disable-next-line jsx-a11y/label-has-associated-control
   return <label {...props} {...stylex.props(styles.label, sx)} />;
 }

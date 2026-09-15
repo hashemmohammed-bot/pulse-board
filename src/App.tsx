@@ -20,13 +20,33 @@ const styles = stylex.create({
 /** Bumped whenever the stored shape changes, so old entries are ignored. */
 const STORAGE_KEY = "pulseboard.users.v1";
 
+/**
+ * Every field the Users page renders. A stored entry missing any of them would
+ * blow up mid-render with no way out but devtools, so a half-written or
+ * hand-edited store is discarded in favour of the shipped dataset.
+ */
+function isStoredUser(value: unknown): value is User {
+  if (typeof value !== "object" || value === null) return false;
+  const u = value as Record<string, unknown>;
+  return (
+    typeof u.id === "string" &&
+    typeof u.name === "string" &&
+    typeof u.email === "string" &&
+    typeof u.role === "string" &&
+    typeof u.team === "string" &&
+    typeof u.status === "string" &&
+    (typeof u.lastLoginAt === "string" || u.lastLoginAt === null)
+  );
+}
+
 /** Storage can be blocked (private windows, disabled site data) or hold junk. */
 function readStoredUsers(): User[] | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as User[]) : null;
+    if (!Array.isArray(parsed) || !parsed.every(isStoredUser)) return null;
+    return parsed;
   } catch {
     return null;
   }

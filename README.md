@@ -23,13 +23,13 @@ claude                         # inside Claude: /mcp should list "playwright"
 
 ## During the workshop
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | local preview |
-| `npm test` | acceptance test — the definition of done |
-| `npm run test:ui` | step through failing tests |
+| Command              | Purpose                                                |
+| -------------------- | ------------------------------------------------------ |
+| `npm run dev`        | local preview                                          |
+| `npm test`           | acceptance test — the definition of done               |
+| `npm run test:ui`    | step through failing tests                             |
 | `npm run screenshot` | capture desktop/tablet/mobile PNGs into `screenshots/` |
-| `npm run typecheck` | TypeScript check |
+| `npm run typecheck`  | TypeScript check                                       |
 
 `CLAUDE.md` is deliberately near-empty. Growing it well is part of the exercise.
 

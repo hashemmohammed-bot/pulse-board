@@ -1,7 +1,7 @@
 {
   "name": "starter",
-  "private": true,
   "version": "0.1.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --port 5173 --strictPort",
@@ -13,7 +13,12 @@
     "test:headed": "playwright test --headed",
     "screenshot": "playwright test tests/screenshot.spec.ts",
     "playwright:install": "playwright install chromium",
-    "test:auth": "playwright test tests/auth.spec.ts"
+    "test:auth": "playwright test tests/auth.spec.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "test:all": "playwright test tests/acceptance.spec.ts tests/auth.spec.ts tests/regression.spec.ts"
   },
   "dependencies": {
     "@stylexjs/stylex": "^0.19.0",
@@ -33,6 +38,8 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "oxfmt": "^0.68.0",
+    "oxlint": "^1.83.0",
     "typescript": "~5.9.0",
     "vite": "^7.1.0"
   }

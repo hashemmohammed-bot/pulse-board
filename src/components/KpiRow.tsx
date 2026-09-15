@@ -24,7 +24,13 @@ const styles = stylex.create({
     padding: "24px",
   },
   label: { margin: 0, fontSize: "16px", color: colors.muted },
-  value: { margin: 0, marginTop: "8px", fontSize: "36px", fontWeight: 700, letterSpacing: "-0.02em" },
+  value: {
+    margin: 0,
+    marginTop: "8px",
+    fontSize: "36px",
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+  },
   deltaRow: {
     margin: 0,
     marginTop: "12px",

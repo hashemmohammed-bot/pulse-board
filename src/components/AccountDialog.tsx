@@ -11,7 +11,12 @@ import { colors } from "@/styles/tokens.stylex";
 import { useDataLabel } from "@/i18n/labels";
 
 const styles = stylex.create({
-  grid: { display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "24px", margin: 0 },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "24px",
+    margin: 0,
+  },
   term: { fontSize: "14px", color: colors.muted },
   detail: { margin: 0, marginTop: "4px", fontSize: "18px", fontWeight: 600 },
   block: { marginTop: "28px" },

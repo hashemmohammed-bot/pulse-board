@@ -35,9 +35,20 @@ const styles = stylex.create({
     boxShadow: "0 24px 70px rgba(15,18,32,0.28)",
   },
   narrow: { maxWidth: "448px" },
-  header: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" },
+  header: {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: "16px",
+  },
   eyebrow: { margin: 0, fontSize: "14px", color: colors.muted },
-  title: { margin: 0, marginTop: "4px", fontSize: "24px", fontWeight: 700, letterSpacing: "-0.01em" },
+  title: {
+    margin: 0,
+    marginTop: "4px",
+    fontSize: "24px",
+    fontWeight: 700,
+    letterSpacing: "-0.01em",
+  },
   body: { marginTop: "28px" },
 });
 
@@ -55,7 +66,10 @@ export function DialogContent({
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay {...stylex.props(styles.overlay)} />
-      <DialogPrimitive.Content {...props} {...stylex.props(styles.content, narrow && styles.narrow)}>
+      <DialogPrimitive.Content
+        {...props}
+        {...stylex.props(styles.content, narrow && styles.narrow)}
+      >
         {children}
       </DialogPrimitive.Content>
     </DialogPrimitive.Portal>

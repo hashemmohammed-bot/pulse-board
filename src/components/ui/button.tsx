@@ -57,7 +57,13 @@ export type ButtonProps = Omit<ComponentProps<"button">, "style" | "className"> 
   sx?: stylex.StyleXStyles;
 };
 
-export function Button({ variant = "default", size = "md", sx, type = "button", ...props }: ButtonProps) {
+export function Button({
+  variant = "default",
+  size = "md",
+  sx,
+  type = "button",
+  ...props
+}: ButtonProps) {
   return (
     <button
       type={type}
