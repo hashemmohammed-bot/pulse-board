@@ -73,3 +73,19 @@ Reads and writes are wrapped in try/catch — blocked storage must never break t
 log to the console. Stored users win over `data.json` on load, so clear that key (or run
 `localStorage.clear()` in the console) to get back to the shipped dataset. Playwright gives
 each test a fresh context, so the store never leaks between acceptance runs.
+
+## Theming
+
+Light and dark share one token set. `@theme` in `src/styles.css` defines the light values;
+the dark block redefines the same `--color-*` variables, so components need no `dark:`
+variants — they already paint with tokens. Add new colours as tokens, never as hex in a
+component.
+
+The theme follows `prefers-color-scheme` until the visitor clicks the toggle, which writes
+`data-theme` on `<html>` and stores the choice under `pulseboard.theme.v1`. An inline script
+in `index.html` replays that choice before first paint to avoid a flash of light.
+
+Recharts writes colours as presentation attributes, which lose to CSS, so the axis ticks
+(`.recharts-cartesian-axis-tick-value` — note v3 does *not* nest the text inside
+`.recharts-cartesian-axis-tick`) and grid lines are themed from `styles.css`. Tooltip styling
+is inline and uses `var(--color-*)`, which resolves correctly in inline styles.

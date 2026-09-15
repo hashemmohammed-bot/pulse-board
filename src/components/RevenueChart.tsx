@@ -11,7 +11,8 @@ import {
 import type { RevenuePoint } from "../types";
 import { compactCurrency, currency, monthLabel } from "../format";
 
-const AXIS = { stroke: "transparent", tick: { fill: "#6b7280", fontSize: 13 } };
+/** Tick colour comes from CSS (see styles.css) so it follows the theme. */
+const AXIS = { stroke: "transparent", tick: { fontSize: 13 } };
 
 export function RevenueChart({ series }: { series: RevenuePoint[] }) {
   const points = series.map((p) => ({ ...p, label: monthLabel(p.month) }));
@@ -47,7 +48,7 @@ export function RevenueChart({ series }: { series: RevenuePoint[] }) {
       >
         <ResponsiveContainer width="100%" height={320}>
           <ComposedChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
-            <CartesianGrid vertical={false} stroke="#e5e7eb" />
+            <CartesianGrid vertical={false} />
             <XAxis dataKey="label" {...AXIS} tickLine={false} axisLine={false} />
             <YAxis
               {...AXIS}
@@ -57,13 +58,17 @@ export function RevenueChart({ series }: { series: RevenuePoint[] }) {
               tickFormatter={(v: number) => (v === 0 ? "0" : compactCurrency(v))}
             />
             <Tooltip
-              cursor={{ fill: "rgba(91,91,214,0.08)" }}
+              cursor={{ fill: "color-mix(in srgb, var(--color-brand-500) 12%, transparent)" }}
               formatter={(value, name) => [currency(Number(value)), String(name)]}
               contentStyle={{
                 borderRadius: 12,
-                border: "1px solid #e3e6ef",
+                border: "1px solid var(--color-line)",
+                background: "var(--color-surface)",
+                color: "var(--color-ink)",
                 fontSize: 13,
               }}
+              itemStyle={{ color: "var(--color-ink)" }}
+              labelStyle={{ color: "var(--color-muted)" }}
             />
             <Bar dataKey="revenue" name="Revenue" fill="var(--color-chart-bar)" radius={[4, 4, 0, 0]} maxBarSize={56} />
             <Line

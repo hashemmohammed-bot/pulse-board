@@ -27,7 +27,7 @@ export function Drawer({ eyebrow, title, onClose, testId, closeTestId, children 
   return (
     <>
       <div
-        className="fixed inset-0 z-40 bg-black/10"
+        className="fixed inset-0 z-40 bg-scrim"
         onClick={onClose}
         aria-hidden="true"
       />

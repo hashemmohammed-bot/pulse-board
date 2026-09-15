@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { DashboardData, User } from "./types";
 import { Dashboard } from "./pages/Dashboard";
 import { Users } from "./pages/Users";
+import { applyTheme, storedTheme, systemTheme, type Theme } from "./theme";
 
 type Page = "dashboard" | "users";
 
@@ -39,6 +40,13 @@ export default function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [page, setPage] = useState<Page>("dashboard");
+  const [theme, setTheme] = useState<Theme>(() => storedTheme() ?? systemTheme());
+
+  function toggleTheme() {
+    const next: Theme = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    applyTheme(next);
+  }
 
   useEffect(() => {
     let alive = true;
@@ -83,6 +91,17 @@ export default function App() {
             </button>
           ))}
         </nav>
+        <button
+          type="button"
+          data-testid="theme-toggle"
+          onClick={toggleTheme}
+          aria-pressed={theme === "dark"}
+          aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+          title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+          className="ml-auto grid h-10 w-10 place-items-center rounded-xl border border-line bg-surface text-lg transition hover:bg-canvas focus-visible:outline-2 focus-visible:outline-brand-600"
+        >
+          <span aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
+        </button>
       </header>
 
       <main className="px-6 pb-12 sm:px-8">

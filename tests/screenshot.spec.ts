@@ -47,6 +47,28 @@ test("screenshot users-edit-1280x800", async ({ page }) => {
   await page.screenshot({ path: "screenshots/users-edit-1280x800.png" });
 });
 
+test("screenshot dark-desktop-1280x800", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await page.locator('[data-account-id="acc-007"]').click();
+  await page.getByTestId("detail-drawer").waitFor();
+  // Clicking the row scrolls it into view; go back up so the KPI row and chart show.
+  await page.evaluate(() => window.scrollTo(0, 0));
+  // Let the chart's entry animation finish before capturing.
+  await page.waitForTimeout(1200);
+  await page.screenshot({ path: "screenshots/dark-desktop-1280x800.png" });
+});
+
+test("screenshot dark-users-1280x800", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await page.getByTestId("nav-users").click();
+  await page.getByTestId("users-page").waitFor();
+  await page.screenshot({ path: "screenshots/dark-users-1280x800.png" });
+});
+
 test("screenshot users-mobile-375x812", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/");

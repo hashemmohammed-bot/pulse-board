@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PulseBoard</title>
+    <script>
+      // Applied before first paint so a remembered dark theme never flashes light.
+      try {
+        var stored = localStorage.getItem("pulseboard.theme.v1");
+        if (stored === "light" || stored === "dark") {
+          document.documentElement.dataset.theme = stored;
+        }
+      } catch (e) {
+        /* storage blocked — fall back to prefers-color-scheme */
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

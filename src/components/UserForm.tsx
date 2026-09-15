@@ -142,7 +142,7 @@ export function UserForm({
           <button
             type="submit"
             data-testid="user-save"
-            className="rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-white transition hover:bg-brand-500"
+            className="rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-on-accent transition hover:bg-brand-500"
           >
             {user ? "Save changes" : "Create user"}
           </button>

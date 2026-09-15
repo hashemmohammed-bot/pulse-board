@@ -50,7 +50,7 @@ export function Users({ users, onChange }: { users: User[]; onChange: (next: Use
             type="button"
             data-testid="user-create"
             onClick={() => setForm("new")}
-            className="rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-white transition hover:bg-brand-500"
+            className="rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-on-accent transition hover:bg-brand-500"
           >
             New user
           </button>

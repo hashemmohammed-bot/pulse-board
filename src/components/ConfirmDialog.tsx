@@ -20,7 +20,7 @@ export function ConfirmDialog({
   }, [onCancel]);
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/30 px-4">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-scrim px-4">
       <div
         data-testid="confirm-delete"
         role="dialog"
@@ -43,7 +43,7 @@ export function ConfirmDialog({
             type="button"
             data-testid="confirm-yes"
             onClick={onConfirm}
-            className="rounded-xl bg-bad px-5 py-2.5 font-semibold text-white transition hover:opacity-90"
+            className="rounded-xl bg-bad px-5 py-2.5 font-semibold text-on-accent transition hover:opacity-90"
           >
             Delete
           </button>

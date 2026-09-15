@@ -1,11 +1,18 @@
 @import "tailwindcss";
 
+/*
+  Every colour in the app is a semantic token, so dark mode is a matter of
+  redefining these values rather than annotating components with dark: variants.
+*/
 @theme {
   --color-canvas: #eceef4;
   --color-surface: #ffffff;
   --color-line: #e3e6ef;
   --color-ink: #16181d;
   --color-muted: #6b7280;
+  /* Text/icons sitting on a filled brand or danger button. */
+  --color-on-accent: #ffffff;
+  --color-scrim: rgba(15, 18, 32, 0.1);
 
   --color-brand-50: #eeeefc;
   --color-brand-100: #e0e0fa;
@@ -25,6 +32,70 @@
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
+/*
+  Dark palette. Applied when the OS asks for it, unless the user has explicitly
+  chosen light, and always when the user has explicitly chosen dark.
+*/
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --color-canvas: #0f1117;
+    --color-surface: #171a21;
+    --color-line: #272c37;
+    --color-ink: #e8eaf0;
+    --color-muted: #9aa1ad;
+    --color-on-accent: #0f1117;
+    --color-scrim: rgba(0, 0, 0, 0.55);
+
+    --color-brand-50: #21244a;
+    --color-brand-100: #2c2f5e;
+    --color-brand-500: #8f8ff5;
+    --color-brand-600: #a5a5f8;
+
+    --color-good: #4ade80;
+    --color-good-soft: #14301f;
+    --color-bad: #f87171;
+    --color-bad-soft: #3a1c1c;
+    --color-warn: #fbbf24;
+    --color-warn-soft: #3a2e10;
+
+    --color-chart-bar: #7f86dd;
+    --color-chart-target: #f0932b;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-canvas: #0f1117;
+  --color-surface: #171a21;
+  --color-line: #272c37;
+  --color-ink: #e8eaf0;
+  --color-muted: #9aa1ad;
+  --color-on-accent: #0f1117;
+  --color-scrim: rgba(0, 0, 0, 0.55);
+
+  --color-brand-50: #21244a;
+  --color-brand-100: #2c2f5e;
+  --color-brand-500: #8f8ff5;
+  --color-brand-600: #a5a5f8;
+
+  --color-good: #4ade80;
+  --color-good-soft: #14301f;
+  --color-bad: #f87171;
+  --color-bad-soft: #3a1c1c;
+  --color-warn: #fbbf24;
+  --color-warn-soft: #3a2e10;
+
+  --color-chart-bar: #7f86dd;
+  --color-chart-target: #f0932b;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
 html {
   background: var(--color-canvas);
   color: var(--color-ink);
@@ -33,6 +104,20 @@ html {
 
 body {
   margin: 0;
+}
+
+/*
+  Recharts writes its colours as presentation attributes, which lose to any CSS
+  rule — so theming the axes and grid here keeps the chart on the token system
+  instead of hard-coding hex values in the component.
+*/
+.recharts-cartesian-axis-tick-value,
+.recharts-cartesian-axis-tick text {
+  fill: var(--color-muted);
+}
+
+.recharts-cartesian-grid line {
+  stroke: var(--color-line);
 }
 
 /* Recharts draws its own focus outlines on every surface; keep them off the
