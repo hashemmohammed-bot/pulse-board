@@ -1,6 +1,10 @@
 import { useState } from "react";
-import type { User, UserRole } from "../types";
-import { Modal } from "./Modal";
+import { useTranslation } from "react-i18next";
+import type { User, UserRole } from "@/types";
+import { Modal } from "@/components/Modal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const ROLES: UserRole[] = ["Admin", "Manager", "Viewer"];
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14,8 +18,7 @@ export interface UserDraft {
 
 type FieldError = { field: "name" | "email"; message: string } | null;
 
-const FIELD =
-  "mt-1.5 w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-base outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
+const FIELD = "mt-1.5 h-11 w-full rounded-xl bg-surface text-base";
 
 export function UserForm({
   user,
@@ -27,6 +30,7 @@ export function UserForm({
   onSave: (draft: UserDraft) => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
   const [draft, setDraft] = useState<UserDraft>({
     name: user?.name ?? "",
     email: user?.email ?? "",
@@ -41,15 +45,20 @@ export function UserForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!draft.name.trim()) {
-      setError({ field: "name", message: "Name is required." });
+      setError({ field: "name", message: t("userForm.errors.name") });
       return;
     }
     if (!EMAIL.test(draft.email.trim())) {
-      setError({ field: "email", message: "Enter a valid email address." });
+      setError({ field: "email", message: t("userForm.errors.email") });
       return;
     }
     setError(null);
-    onSave({ ...draft, name: draft.name.trim(), email: draft.email.trim(), team: draft.team.trim() });
+    onSave({
+      ...draft,
+      name: draft.name.trim(),
+      email: draft.email.trim(),
+      team: draft.team.trim(),
+    });
   }
 
   const errorFor = (field: "name" | "email") =>
@@ -59,21 +68,22 @@ export function UserForm({
       </p>
     ) : null;
 
-  const ring = (field: "name" | "email") => (error?.field === field ? " border-bad ring-2 ring-bad-soft" : "");
+  const ring = (field: "name" | "email") =>
+    error?.field === field ? " border-bad ring-2 ring-bad-soft" : "";
 
   return (
     <Modal
-      eyebrow={user ? "Edit user" : "New user"}
-      title={user ? user.name : "Invite a teammate"}
+      eyebrow={user ? t("userForm.eyebrowEdit") : t("userForm.eyebrowNew")}
+      title={user ? user.name : t("userForm.titleNew")}
       onClose={onCancel}
       testId="user-dialog"
     >
       <form data-testid="user-form" onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
         <div>
-          <label htmlFor="user-name" className="text-sm text-muted">
-            Name
-          </label>
-          <input
+          <Label htmlFor="user-name" className="text-sm text-muted">
+            {t("userForm.name")}
+          </Label>
+          <Input
             id="user-name"
             name="name"
             value={draft.name}
@@ -84,10 +94,10 @@ export function UserForm({
         </div>
 
         <div>
-          <label htmlFor="user-email" className="text-sm text-muted">
-            Email
-          </label>
-          <input
+          <Label htmlFor="user-email" className="text-sm text-muted">
+            {t("userForm.email")}
+          </Label>
+          <Input
             id="user-email"
             name="email"
             type="text"
@@ -99,15 +109,20 @@ export function UserForm({
         </div>
 
         <div>
-          <label htmlFor="user-role" className="text-sm text-muted">
-            Role
-          </label>
+          <Label htmlFor="user-role" className="text-sm text-muted">
+            {t("userForm.role")}
+          </Label>
+          {/*
+            Deliberately a native <select>: the acceptance test drives it with
+            selectOption(), which needs a real <select name="role"> element and
+            would fail against the Radix-based shadcn Select.
+          */}
           <select
             id="user-role"
             name="role"
             value={draft.role}
             onChange={(e) => set({ role: e.target.value as UserRole })}
-            className={FIELD}
+            className="mt-1.5 h-11 w-full rounded-xl border border-input bg-surface px-3 text-base outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
           >
             {ROLES.map((role) => (
               <option key={role} value={role}>
@@ -118,10 +133,10 @@ export function UserForm({
         </div>
 
         <div>
-          <label htmlFor="user-team" className="text-sm text-muted">
-            Team
-          </label>
-          <input
+          <Label htmlFor="user-team" className="text-sm text-muted">
+            {t("userForm.team")}
+          </Label>
+          <Input
             id="user-team"
             name="team"
             value={draft.team}
@@ -131,21 +146,18 @@ export function UserForm({
         </div>
 
         <div className="mt-2 flex justify-end gap-3">
-          <button
+          <Button
             type="button"
+            variant="outline"
             data-testid="user-cancel"
             onClick={onCancel}
-            className="rounded-xl border border-line bg-surface px-5 py-2.5 font-semibold transition hover:bg-canvas"
+            className="rounded-xl px-5"
           >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            data-testid="user-save"
-            className="rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-on-accent transition hover:bg-brand-500"
-          >
-            {user ? "Save changes" : "Create user"}
-          </button>
+            {t("common.cancel")}
+          </Button>
+          <Button type="submit" data-testid="user-save" className="rounded-xl px-5">
+            {user ? t("userForm.save") : t("userForm.create")}
+          </Button>
         </div>
       </form>
     </Modal>

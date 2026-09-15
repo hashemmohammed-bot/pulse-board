@@ -1,21 +1,31 @@
 import { useMemo, useState } from "react";
-import type { Account } from "../types";
-import { currency } from "../format";
-import { Badge } from "./Badge";
-import { HealthBar } from "./HealthBar";
+import { useTranslation } from "react-i18next";
+import type { Account } from "@/types";
+import { currency } from "@/format";
+import { StatusBadge } from "@/components/StatusBadge";
+import { HealthBar } from "@/components/HealthBar";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type SortKey = "name" | "plan" | "region" | "owner" | "mrr" | "seats" | "status" | "health";
 type SortState = { key: SortKey; dir: "asc" | "desc" } | null;
 
-const COLUMNS: { key: SortKey; label: string; numeric?: boolean }[] = [
-  { key: "name", label: "Account" },
-  { key: "plan", label: "Plan" },
-  { key: "region", label: "Region" },
-  { key: "owner", label: "Owner" },
-  { key: "mrr", label: "MRR", numeric: true },
-  { key: "seats", label: "Seats", numeric: true },
-  { key: "status", label: "Status" },
-  { key: "health", label: "Health", numeric: true },
+const COLUMNS: { key: SortKey; numeric?: boolean }[] = [
+  { key: "name" },
+  { key: "plan" },
+  { key: "region" },
+  { key: "owner" },
+  { key: "mrr", numeric: true },
+  { key: "seats", numeric: true },
+  { key: "status" },
+  { key: "health", numeric: true },
 ];
 
 /** The five fields the acceptance test expects the filter to search. */
@@ -28,6 +38,7 @@ export function AccountsTable({
   accounts: Account[];
   onSelect: (account: Account) => void;
 }) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   // Starts unsorted so the first click on a header sorts ascending.
   const [sort, setSort] = useState<SortState>(null);
@@ -43,43 +54,49 @@ export function AccountsTable({
     return [...filtered].sort((a, b) => {
       const x = a[sort.key];
       const y = b[sort.key];
-      const cmp = typeof x === "number" && typeof y === "number" ? x - y : String(x).localeCompare(String(y));
+      const cmp =
+        typeof x === "number" && typeof y === "number" ? x - y : String(x).localeCompare(String(y));
       return cmp * factor;
     });
   }, [accounts, query, sort]);
 
   const toggleSort = (key: SortKey) =>
-    setSort((prev) => (prev?.key === key ? { key, dir: prev.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }));
+    setSort((prev) =>
+      prev?.key === key ? { key, dir: prev.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" },
+    );
 
   return (
     <section className="rounded-2xl border border-line bg-surface p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold tracking-tight">Accounts</h2>
-          <p className="mt-1 text-sm text-muted">
-            {rows.length} {rows.length === 1 ? "account" : "accounts"}
-          </p>
+          <h2 className="text-lg font-bold tracking-tight">{t("accounts.title")}</h2>
+          <p className="mt-1 text-sm text-muted">{t("accounts.count", { count: rows.length })}</p>
         </div>
-        <input
+        <Input
           data-testid="table-filter"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Filter accounts…"
-          aria-label="Filter accounts by name, owner, plan, region or status"
-          className="w-full max-w-xs rounded-xl border border-line bg-surface px-4 py-2.5 text-base outline-none placeholder:text-muted focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+          placeholder={t("accounts.filterPlaceholder")}
+          aria-label={t("accounts.filterLabel")}
+          className="h-11 w-full max-w-xs rounded-xl bg-surface text-base"
         />
       </div>
 
-      <div className="mt-4 overflow-x-auto">
-        <table data-testid="accounts-table" className="w-full min-w-[820px] border-collapse text-left">
-          <thead>
-            <tr className="border-b border-line">
+      <div className="mt-4">
+        <Table data-testid="accounts-table" className="min-w-[820px] text-left">
+          <TableHeader>
+            <TableRow className="border-line hover:bg-transparent">
               {COLUMNS.map((col) => (
-                <th
+                <TableHead
                   key={col.key}
-                  scope="col"
-                  aria-sort={sort?.key === col.key ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}
-                  className={`py-3 text-sm font-medium text-muted ${col.key === "health" ? "" : "pr-4"} ${
+                  aria-sort={
+                    sort?.key === col.key
+                      ? sort.dir === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                  }
+                  className={`text-sm font-medium text-muted ${col.key === "health" ? "" : "pr-4"} ${
                     col.numeric ? "text-right" : ""
                   }`}
                 >
@@ -91,16 +108,18 @@ export function AccountsTable({
                       col.numeric ? "flex-row-reverse" : ""
                     } ${sort?.key === col.key ? "text-ink" : ""}`}
                   >
-                    {col.label}
-                    <span aria-hidden="true">{sort?.key === col.key ? (sort.dir === "asc" ? "↑" : "↓") : ""}</span>
+                    {t(`accounts.columns.${col.key}`)}
+                    <span aria-hidden="true">
+                      {sort?.key === col.key ? (sort.dir === "asc" ? "↑" : "↓") : ""}
+                    </span>
                   </button>
-                </th>
+                </TableHead>
               ))}
-            </tr>
-          </thead>
-          <tbody>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((a) => (
-              <tr
+              <TableRow
                 key={a.id}
                 data-testid="account-row"
                 data-account-id={a.id}
@@ -112,33 +131,40 @@ export function AccountsTable({
                     onSelect(a);
                   }
                 }}
-                className="cursor-pointer border-b border-line/70 transition last:border-0 hover:bg-brand-50/60 focus-visible:bg-brand-50"
+                className="cursor-pointer border-line/70 hover:bg-brand-50/60 focus-visible:bg-brand-50"
               >
-                <td className="py-3.5 pr-4 font-semibold">{a.name}</td>
-                <td className="py-3.5 pr-4">{a.plan}</td>
-                <td className="py-3.5 pr-4">{a.region}</td>
-                <td className="py-3.5 pr-4">{a.owner}</td>
-                <td data-testid="cell-mrr" className="py-3.5 pr-4 text-right tabular-nums">
+                <TableCell className="py-3.5 pr-4 font-semibold">{a.name}</TableCell>
+                <TableCell className="py-3.5 pr-4">{a.plan}</TableCell>
+                <TableCell className="py-3.5 pr-4">{a.region}</TableCell>
+                <TableCell className="py-3.5 pr-4">{a.owner}</TableCell>
+                <TableCell
+                  data-testid="cell-mrr"
+                  className="py-3.5 pr-4 text-right tabular-nums"
+                >
                   {currency(a.mrr)}
-                </td>
-                <td className="py-3.5 pr-4 text-right tabular-nums">{a.seats}</td>
-                <td className="py-3.5 pr-4">
-                  <Badge label={a.status} />
-                </td>
-                <td className="py-3.5 text-right">
+                </TableCell>
+                <TableCell className="py-3.5 pr-4 text-right tabular-nums">{a.seats}</TableCell>
+                <TableCell className="py-3.5 pr-4">
+                  <StatusBadge label={a.status} />
+                </TableCell>
+                <TableCell className="py-3.5 text-right">
                   <HealthBar score={a.health} />
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
             {rows.length === 0 && (
-              <tr>
-                <td data-testid="table-empty" colSpan={COLUMNS.length} className="py-12 text-center text-muted">
-                  No accounts match “{query}”.
-                </td>
-              </tr>
+              <TableRow className="hover:bg-transparent">
+                <TableCell
+                  data-testid="table-empty"
+                  colSpan={COLUMNS.length}
+                  className="py-12 text-center text-muted"
+                >
+                  {t("accounts.empty", { query })}
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </section>
   );

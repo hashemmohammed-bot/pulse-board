@@ -1,12 +1,17 @@
 import { useState } from "react";
-import { verifyCredentials } from "../auth";
+import { useTranslation } from "react-i18next";
+import { verifyCredentials } from "@/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { LANGUAGES } from "@/i18n";
 
 type FieldError = { field: "name" | "password"; message: string } | null;
 
-const FIELD =
-  "mt-1.5 w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-base outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
+const FIELD = "mt-1.5 h-11 w-full rounded-xl bg-surface text-base";
 
 export function Login({ onSignedIn }: { onSignedIn: (username: string) => void }) {
+  const { t, i18n } = useTranslation();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   // Rendered only after a failed submit, so login-error is absent until then.
@@ -15,15 +20,15 @@ export function Login({ onSignedIn }: { onSignedIn: (username: string) => void }
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) {
-      setError({ field: "name", message: "Enter your name." });
+      setError({ field: "name", message: t("auth.errors.name") });
       return;
     }
     if (!password) {
-      setError({ field: "password", message: "Enter your password." });
+      setError({ field: "password", message: t("auth.errors.password") });
       return;
     }
     if (!verifyCredentials(name, password)) {
-      setError({ field: "password", message: "Incorrect name or password." });
+      setError({ field: "password", message: t("auth.errors.invalid") });
       return;
     }
     setError(null);
@@ -36,19 +41,49 @@ export function Login({ onSignedIn }: { onSignedIn: (username: string) => void }
   return (
     <main className="grid min-h-screen place-items-center bg-canvas p-4">
       <div className="w-full max-w-[420px] rounded-2xl border border-line bg-surface px-8 py-9">
-        <div className="flex items-center gap-3">
-          <span className="h-9 w-9 rounded-xl bg-brand-500" aria-hidden="true" />
-          <h1 className="text-2xl font-bold tracking-tight">PulseBoard</h1>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="h-9 w-9 rounded-xl bg-brand-500" aria-hidden="true" />
+            <h1 className="text-2xl font-bold tracking-tight">PulseBoard</h1>
+          </div>
+          <div
+            role="group"
+            aria-label={t("language.label")}
+            className="flex items-center rounded-xl border border-line p-1"
+          >
+            {LANGUAGES.map((lng) => (
+              <button
+                key={lng}
+                type="button"
+                data-testid={`login-lang-${lng}`}
+                onClick={() => void i18n.changeLanguage(lng)}
+                aria-pressed={i18n.resolvedLanguage === lng}
+                className={`rounded-lg px-2.5 py-1 text-sm font-semibold transition ${
+                  i18n.resolvedLanguage === lng
+                    ? "bg-brand-100 text-brand-600"
+                    : "text-muted hover:text-ink"
+                }`}
+              >
+                {lng.toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
-        <p className="mt-6 text-lg font-semibold">Sign in</p>
-        <p className="mt-1 text-sm text-muted">Use your PulseBoard account to continue.</p>
 
-        <form data-testid="login-form" onSubmit={handleSubmit} noValidate className="mt-6 flex flex-col gap-5">
+        <p className="mt-6 text-lg font-semibold">{t("auth.title")}</p>
+        <p className="mt-1 text-sm text-muted">{t("auth.subtitle")}</p>
+
+        <form
+          data-testid="login-form"
+          onSubmit={handleSubmit}
+          noValidate
+          className="mt-6 flex flex-col gap-5"
+        >
           <div>
-            <label htmlFor="login-name" className="text-sm text-muted">
-              Name
-            </label>
-            <input
+            <Label htmlFor="login-name" className="text-sm text-muted">
+              {t("auth.name")}
+            </Label>
+            <Input
               id="login-name"
               name="name"
               type="text"
@@ -60,10 +95,10 @@ export function Login({ onSignedIn }: { onSignedIn: (username: string) => void }
           </div>
 
           <div>
-            <label htmlFor="login-password" className="text-sm text-muted">
-              Password
-            </label>
-            <input
+            <Label htmlFor="login-password" className="text-sm text-muted">
+              {t("auth.password")}
+            </Label>
+            <Input
               id="login-password"
               name="password"
               type="password"
@@ -80,15 +115,10 @@ export function Login({ onSignedIn }: { onSignedIn: (username: string) => void }
             </p>
           )}
 
-          <button
-            type="submit"
-            data-testid="login-submit"
-            className="mt-1 rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-on-accent transition hover:bg-brand-500"
-          >
-            Sign in
-          </button>
+          <Button type="submit" data-testid="login-submit" className="mt-1 h-11 rounded-xl">
+            {t("auth.submit")}
+          </Button>
         </form>
-
       </div>
     </main>
   );

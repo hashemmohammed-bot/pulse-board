@@ -1,4 +1,13 @@
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface ModalProps {
   /** Small label above the title, e.g. "Account". */
@@ -12,49 +21,41 @@ interface ModalProps {
 }
 
 /**
- * Centred modal card. The caller renders it only while it is open, so a closed
- * modal is absent from the DOM. Escape and a backdrop click both close it.
+ * Centred modal built on the shadcn Dialog. Radix supplies role="dialog", the
+ * focus trap, Escape and the backdrop click, so this only adds the header
+ * layout and the testids the acceptance suite looks for.
+ *
+ * The caller renders it only while it is open, hence open={true} with onClose
+ * wired to Radix's dismiss events.
  */
 export function Modal({ eyebrow, title, onClose, testId, closeTestId, children }: ModalProps) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
   return (
-    <div
-      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-scrim p-4 sm:p-6"
-      onClick={onClose}
-    >
-      <div
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
         data-testid={testId}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        // The backdrop closes on click; the card must not pass its own clicks up.
-        onClick={(e) => e.stopPropagation()}
-        className="max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-2xl border border-line bg-surface px-8 py-7 shadow-[0_24px_70px_rgba(15,18,32,0.28)]"
+        showCloseButton={false}
+        className="max-h-[90vh] gap-0 overflow-y-auto rounded-2xl border-line bg-surface px-8 py-7 sm:max-w-[560px]"
       >
-        <div className="flex items-start justify-between gap-4">
+        <DialogHeader className="flex-row items-start justify-between gap-4 space-y-0 text-left">
           <div>
-            <p className="text-sm text-muted">{eyebrow}</p>
-            <h2 className="mt-1 text-2xl font-bold tracking-tight">{title}</h2>
+            <DialogDescription className="text-sm text-muted">{eyebrow}</DialogDescription>
+            <DialogTitle className="mt-1 text-2xl font-bold tracking-tight">{title}</DialogTitle>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            data-testid={closeTestId}
-            aria-label="Close"
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line bg-surface text-xl leading-none text-ink transition hover:bg-canvas focus-visible:outline-2 focus-visible:outline-brand-600"
-          >
-            &#10005;
-          </button>
-        </div>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              data-testid={closeTestId}
+              aria-label="Close"
+              className="h-10 w-10 shrink-0 rounded-xl text-xl leading-none"
+            >
+              <span aria-hidden="true">&#10005;</span>
+            </Button>
+          </DialogClose>
+        </DialogHeader>
         <div className="mt-7">{children}</div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

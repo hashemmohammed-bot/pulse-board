@@ -1,20 +1,12 @@
 import { useEffect, useState } from "react";
+import { RouterProvider } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import type { DashboardData, User } from "./types";
-import { Dashboard } from "./pages/Dashboard";
-import { Users } from "./pages/Users";
 import { Login } from "./pages/Login";
+import { router } from "./routes";
+import { AppStateProvider } from "./app-context";
 import { applyTheme, storedTheme, systemTheme, type Theme } from "./theme";
 import { AUTH_REQUIRED, endSession, readSession, startSession } from "./auth";
-
-/**
- * The gate is off in the acceptance run, so `?login=1` forces the screen to
- * render anyway — that is how the login screenshot is captured.
- */
-function loginForced() {
-  return new URLSearchParams(window.location.search).has("login");
-}
-
-type Page = "dashboard" | "users";
 
 /** Bumped whenever the stored shape changes, so old entries are ignored. */
 const STORAGE_KEY = "pulseboard.users.v1";
@@ -39,25 +31,25 @@ function writeStoredUsers(users: User[]) {
   }
 }
 
-const NAV: { id: Page; label: string }[] = [
-  { id: "dashboard", label: "Dashboard" },
-  { id: "users", label: "Users" },
-];
+/**
+ * The gate is off in the acceptance run, so `?login=1` forces the screen to
+ * render anyway — that is how the login screenshot is captured.
+ */
+function loginForced() {
+  return new URLSearchParams(window.location.search).has("login");
+}
 
+/**
+ * Owns everything that must outlive a route change: the dataset, the Users
+ * edits, the theme and the session. The router renders beneath it.
+ */
 export default function App() {
+  const { t } = useTranslation();
   const [data, setData] = useState<DashboardData | null>(null);
-  // Users state lives here, above the page switch, so edits survive navigation.
   const [users, setUsers] = useState<User[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [page, setPage] = useState<Page>("dashboard");
   const [theme, setTheme] = useState<Theme>(() => storedTheme() ?? systemTheme());
   const [session, setSession] = useState<string | null>(() => readSession());
-
-  function toggleTheme() {
-    const next: Theme = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    applyTheme(next);
-  }
 
   useEffect(() => {
     let alive = true;
@@ -79,6 +71,12 @@ export default function App() {
     };
   }, []);
 
+  function toggleTheme() {
+    const next: Theme = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    applyTheme(next);
+  }
+
   if (!session && (AUTH_REQUIRED || loginForced())) {
     return (
       <Login
@@ -90,80 +88,43 @@ export default function App() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-canvas">
-      <header className="flex flex-wrap items-center gap-6 px-6 py-5 sm:px-8">
-        <div className="flex items-center gap-3">
-          <span className="h-9 w-9 rounded-xl bg-brand-500" aria-hidden="true" />
-          <h1 className="text-2xl font-bold tracking-tight">PulseBoard</h1>
-        </div>
-        <nav aria-label="Main" className="flex items-center gap-1">
-          {NAV.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              data-testid={`nav-${item.id}`}
-              aria-current={page === item.id ? "page" : undefined}
-              onClick={() => setPage(item.id)}
-              className={`rounded-xl px-4 py-2 text-lg font-medium transition ${
-                page === item.id ? "bg-brand-100 text-brand-600" : "text-muted hover:text-ink"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
-        <div className="ml-auto flex items-center gap-3">
-          <button
-            type="button"
-            data-testid="theme-toggle"
-            onClick={toggleTheme}
-            aria-pressed={theme === "dark"}
-            aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-            title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-            className="grid h-10 w-10 place-items-center rounded-xl border border-line bg-surface text-lg transition hover:bg-canvas focus-visible:outline-2 focus-visible:outline-brand-600"
-          >
-            <span aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
-          </button>
-          {session && (
-            <>
-              <span data-testid="session-user" className="hidden text-sm text-muted sm:inline">
-                Signed in as <span className="font-semibold text-ink">{session}</span>
-              </span>
-              <button
-                type="button"
-                data-testid="logout"
-                onClick={() => {
-                  endSession();
-                  setSession(null);
-                }}
-                className="rounded-xl border border-line bg-surface px-4 py-2 text-sm font-semibold transition hover:bg-canvas"
-              >
-                Sign out
-              </button>
-            </>
-          )}
-        </div>
-      </header>
-
-      <main className="px-6 pb-12 sm:px-8">
-        {loadError && (
-          <p role="alert" className="rounded-2xl border border-line bg-surface p-6 text-bad">
-            Could not load the dashboard data: {loadError}
-          </p>
-        )}
-        {!data && !loadError && <p className="p-6 text-muted">Loading…</p>}
-        {data && page === "dashboard" && <Dashboard data={data} />}
-        {data && page === "users" && (
-          <Users
-            users={users}
-            onChange={(next) => {
-              setUsers(next);
-              writeStoredUsers(next);
-            }}
-          />
-        )}
+  if (loadError) {
+    return (
+      <main className="p-6">
+        <p role="alert" className="rounded-2xl border border-line bg-surface p-6 text-bad">
+          {t("app.loadError", { message: loadError })}
+        </p>
       </main>
-    </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <main className="p-6">
+        <p className="text-muted">{t("app.loading")}</p>
+      </main>
+    );
+  }
+
+  return (
+    <AppStateProvider
+      value={{
+        data,
+        users,
+        setUsers: (next) => {
+          setUsers(next);
+          writeStoredUsers(next);
+        },
+        theme,
+        toggleTheme,
+        session,
+        signOut: () => {
+          endSession();
+          setSession(null);
+        },
+      }}
+    >
+      <RouterProvider router={router} />
+    </AppStateProvider>
   );
 }

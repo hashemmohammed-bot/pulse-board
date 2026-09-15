@@ -31,11 +31,11 @@ export const isGoodDelta = (kpi: Kpi) => (kpi.delta >= 0) === kpi.higherIsBetter
  * `May 22, 2023`. Date-only strings are split by hand so they are not pulled a
  * day backwards by the UTC-midnight parse in local timezones behind UTC.
  */
-export function formatDate(iso: string | null): string {
+export function formatDate(iso: string | null, locale = "en-US"): string {
   if (!iso) return "—";
   const [datePart] = iso.split("T");
   const [y, m, d] = datePart.split("-").map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+  return new Date(y, m - 1, d).toLocaleDateString(locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -43,9 +43,9 @@ export function formatDate(iso: string | null): string {
 }
 
 /** `2026-03` -> `Mar`, for the chart axis. */
-export function monthLabel(month: string): string {
+export function monthLabel(month: string, locale = "en-US"): string {
   const [y, m] = month.split("-").map(Number);
-  return new Date(y, m - 1, 1).toLocaleDateString("en-US", { month: "short" });
+  return new Date(y, m - 1, 1).toLocaleDateString(locale, { month: "short" });
 }
 
 /** `Priya Raman` -> `PR`, for the users table avatars. */

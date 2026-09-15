@@ -13,26 +13,26 @@ export default defineConfig({
   retries: 0,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
-    baseURL: "http://localhost:5173",
+    baseURL: "http://localhost:5174",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } } },
   ],
+  /**
+   * Tests get their own server on their own port.
+   *
+   * The app requires sign-in by default, but acceptance.spec.ts expects the
+   * dashboard immediately on load and must not be edited, so this server runs
+   * with the gate off. It deliberately does NOT share port 5173 with
+   * `npm run dev`: reusing a dev server started without that variable leaves
+   * every test sitting on the login screen.
+   */
   webServer: {
-    command: "npm run dev",
-    url: "http://localhost:5173",
-    reuseExistingServer: true,
-    /**
-     * The app requires sign-in by default, but acceptance.spec.ts expects the
-     * dashboard immediately on load and must not be edited — so the server the
-     * tests start runs with the gate off.
-     *
-     * Because reuseExistingServer is on, a dev server that is ALREADY running
-     * (with the gate on) is reused as-is and every test then stops at the login
-     * screen. Stop your dev server before running npm test.
-     */
+    command: "npm run dev -- --port 5174",
+    url: "http://localhost:5174",
+    reuseExistingServer: false,
     env: { VITE_REQUIRE_AUTH: "false" },
     timeout: 60_000,
   },

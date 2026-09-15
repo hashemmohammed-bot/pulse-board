@@ -1,11 +1,13 @@
 import { useState } from "react";
-import type { Account, DashboardData } from "../types";
-import { KpiRow } from "../components/KpiRow";
-import { RevenueChart } from "../components/RevenueChart";
-import { AccountsTable } from "../components/AccountsTable";
-import { AccountDialog } from "../components/AccountDialog";
+import type { Account } from "@/types";
+import { KpiRow } from "@/components/KpiRow";
+import { RevenueChart } from "@/components/RevenueChart";
+import { AccountsTable } from "@/components/AccountsTable";
+import { AccountDialog } from "@/components/AccountDialog";
+import { useAppState } from "@/app-context";
 
-export function Dashboard({ data }: { data: DashboardData }) {
+export function Dashboard() {
+  const { data } = useAppState();
   const [selected, setSelected] = useState<Account | null>(null);
 
   return (

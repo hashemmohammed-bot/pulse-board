@@ -1,23 +1,40 @@
 import { useState } from "react";
-import type { User } from "../types";
-import { formatDate, initials } from "../format";
-import { Badge } from "../components/Badge";
-import { UserForm, type UserDraft } from "../components/UserForm";
-import { ConfirmDialog } from "../components/ConfirmDialog";
+import { useTranslation } from "react-i18next";
+import type { User } from "@/types";
+import { formatDate, initials } from "@/format";
+import { dateLocale } from "@/i18n";
+import { useAppState } from "@/app-context";
+import { StatusBadge } from "@/components/StatusBadge";
+import { UserForm, type UserDraft } from "@/components/UserForm";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 /** null = the form is closed; "new" = creating; a User = editing that user. */
 type FormState = null | "new" | User;
 
-export function Users({ users, onChange }: { users: User[]; onChange: (next: User[]) => void }) {
+const COLUMNS = ["name", "email", "role", "team", "status", "lastLogin", "actions"] as const;
+
+export function Users() {
+  const { t, i18n } = useTranslation();
+  const { users, setUsers } = useAppState();
   const [form, setForm] = useState<FormState>(null);
   const [pendingDelete, setPendingDelete] = useState<User | null>(null);
+  const locale = dateLocale(i18n.resolvedLanguage ?? "en");
 
   function save(draft: UserDraft) {
     if (form && form !== "new") {
       const id = form.id;
-      onChange(users.map((u) => (u.id === id ? { ...u, ...draft } : u)));
+      setUsers(users.map((u) => (u.id === id ? { ...u, ...draft } : u)));
     } else {
-      onChange([
+      setUsers([
         ...users,
         {
           id: `usr-${crypto.randomUUID().slice(0, 8)}`,
@@ -32,7 +49,7 @@ export function Users({ users, onChange }: { users: User[]; onChange: (next: Use
   }
 
   function confirmDelete() {
-    if (pendingDelete) onChange(users.filter((u) => u.id !== pendingDelete.id));
+    if (pendingDelete) setUsers(users.filter((u) => u.id !== pendingDelete.id));
     setPendingDelete(null);
   }
 
@@ -41,45 +58,46 @@ export function Users({ users, onChange }: { users: User[]; onChange: (next: Use
       <section className="rounded-2xl border border-line bg-surface p-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold tracking-tight">Users</h2>
-            <p className="mt-1 text-sm text-muted">
-              {users.length} {users.length === 1 ? "person" : "people"}
-            </p>
+            <h2 className="text-lg font-bold tracking-tight">{t("users.title")}</h2>
+            <p className="mt-1 text-sm text-muted">{t("users.count", { count: users.length })}</p>
           </div>
-          <button
+          <Button
             type="button"
             data-testid="user-create"
             onClick={() => setForm("new")}
-            className="rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-on-accent transition hover:bg-brand-500"
+            className="rounded-xl px-5"
           >
-            New user
-          </button>
+            {t("users.new")}
+          </Button>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
-          <table data-testid="users-table" className="w-full min-w-[820px] border-collapse text-left">
-            <thead>
-              <tr className="border-b border-line text-sm font-medium text-muted">
-                <th scope="col" className="py-3 pr-4">Name</th>
-                <th scope="col" className="py-3 pr-4">Email</th>
-                <th scope="col" className="py-3 pr-4">Role</th>
-                <th scope="col" className="py-3 pr-4">Team</th>
-                <th scope="col" className="py-3 pr-4">Status</th>
-                <th scope="col" className="py-3 pr-4">Last login</th>
-                <th scope="col" className="py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+        <div className="mt-4">
+          <Table data-testid="users-table" className="min-w-[820px] text-left">
+            <TableHeader>
+              <TableRow className="border-line hover:bg-transparent">
+                {COLUMNS.map((col) => (
+                  <TableHead
+                    key={col}
+                    className={`text-sm font-medium text-muted ${
+                      col === "actions" ? "text-right" : "pr-4"
+                    }`}
+                  >
+                    {t(`users.columns.${col}`)}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {users.map((u) => (
-                <tr
+                <TableRow
                   key={u.id}
                   data-testid="user-row"
                   data-user-id={u.id}
-                  className={`border-b border-line/70 last:border-0 ${
+                  className={`border-line/70 ${
                     form !== "new" && form?.id === u.id ? "bg-brand-50" : ""
                   }`}
                 >
-                  <td className="py-3.5 pr-4">
+                  <TableCell className="py-3.5 pr-4">
                     <span className="flex items-center gap-3">
                       <span
                         aria-hidden="true"
@@ -89,38 +107,43 @@ export function Users({ users, onChange }: { users: User[]; onChange: (next: Use
                       </span>
                       <span className="font-semibold">{u.name}</span>
                     </span>
-                  </td>
-                  <td className="py-3.5 pr-4">{u.email}</td>
-                  <td className="py-3.5 pr-4">{u.role}</td>
-                  <td className="py-3.5 pr-4">{u.team}</td>
-                  <td className="py-3.5 pr-4">
-                    <Badge label={u.status} />
-                  </td>
-                  <td className="py-3.5 pr-4 text-muted">{formatDate(u.lastLoginAt)}</td>
-                  <td className="py-3.5 text-right whitespace-nowrap">
-                    <button
+                  </TableCell>
+                  <TableCell className="py-3.5 pr-4">{u.email}</TableCell>
+                  <TableCell className="py-3.5 pr-4">{u.role}</TableCell>
+                  <TableCell className="py-3.5 pr-4">{u.team}</TableCell>
+                  <TableCell className="py-3.5 pr-4">
+                    <StatusBadge label={u.status} />
+                  </TableCell>
+                  <TableCell className="py-3.5 pr-4 text-muted">
+                    {formatDate(u.lastLoginAt, locale)}
+                  </TableCell>
+                  <TableCell className="py-3.5 text-right whitespace-nowrap">
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="sm"
                       data-testid="user-edit"
                       onClick={() => setForm(u)}
-                      aria-label={`Edit ${u.name}`}
-                      className="rounded-lg border border-line px-3 py-1.5 text-sm font-semibold transition hover:bg-canvas"
+                      aria-label={t("users.editLabel", { name: u.name })}
                     >
-                      Edit
-                    </button>
-                    <button
+                      {t("users.edit")}
+                    </Button>
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="sm"
                       data-testid="user-delete"
                       onClick={() => setPendingDelete(u)}
-                      aria-label={`Delete ${u.name}`}
-                      className="ml-2 rounded-lg border border-line px-3 py-1.5 text-sm font-semibold text-bad transition hover:bg-bad-soft"
+                      aria-label={t("users.deleteLabel", { name: u.name })}
+                      className="ml-2 text-bad hover:bg-bad-soft hover:text-bad"
                     >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
+                      {t("users.delete")}
+                    </Button>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </section>
 
@@ -136,8 +159,8 @@ export function Users({ users, onChange }: { users: User[]; onChange: (next: Use
 
       {pendingDelete && (
         <ConfirmDialog
-          title="Delete user?"
-          message={`${pendingDelete.name} will be removed from PulseBoard. This cannot be undone.`}
+          title={t("users.confirmTitle")}
+          message={t("users.confirmMessage", { name: pendingDelete.name })}
           onConfirm={confirmDelete}
           onCancel={() => setPendingDelete(null)}
         />
