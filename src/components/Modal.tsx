@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 
-interface DrawerProps {
+interface ModalProps {
   /** Small label above the title, e.g. "Account". */
   eyebrow: string;
   title: string;
@@ -12,10 +12,10 @@ interface DrawerProps {
 }
 
 /**
- * Right-hand slide-in panel. The caller renders it only while it is open, so a
- * closed drawer is absent from the DOM. Escape always closes it.
+ * Centred modal card. The caller renders it only while it is open, so a closed
+ * modal is absent from the DOM. Escape and a backdrop click both close it.
  */
-export function Drawer({ eyebrow, title, onClose, testId, closeTestId, children }: DrawerProps) {
+export function Modal({ eyebrow, title, onClose, testId, closeTestId, children }: ModalProps) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -25,18 +25,18 @@ export function Drawer({ eyebrow, title, onClose, testId, closeTestId, children 
   }, [onClose]);
 
   return (
-    <>
+    <div
+      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-scrim p-4 sm:p-6"
+      onClick={onClose}
+    >
       <div
-        className="fixed inset-0 z-40 bg-scrim"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <aside
         data-testid={testId}
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="fixed inset-y-0 right-0 z-50 flex w-full max-w-[460px] flex-col overflow-y-auto bg-surface px-8 py-7 shadow-[0_0_40px_rgba(15,18,32,0.18)]"
+        // The backdrop closes on click; the card must not pass its own clicks up.
+        onClick={(e) => e.stopPropagation()}
+        className="max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-2xl border border-line bg-surface px-8 py-7 shadow-[0_24px_70px_rgba(15,18,32,0.28)]"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -54,7 +54,7 @@ export function Drawer({ eyebrow, title, onClose, testId, closeTestId, children 
           </button>
         </div>
         <div className="mt-7">{children}</div>
-      </aside>
-    </>
+      </div>
+    </div>
   );
 }

@@ -89,3 +89,13 @@ Recharts writes colours as presentation attributes, which lose to CSS, so the ax
 (`.recharts-cartesian-axis-tick-value` — note v3 does *not* nest the text inside
 `.recharts-cartesian-axis-tick`) and grid lines are themed from `styles.css`. Tooltip styling
 is inline and uses `var(--color-*)`, which resolves correctly in inline styles.
+
+## Dialogs
+
+The account detail and the user form are centred modals built on `Modal.tsx`; the delete
+confirmation has its own `ConfirmDialog.tsx`. The reference designs draw the first two as
+right-hand drawers — the centred treatment is a deliberate departure, not drift.
+
+Their testids are still `detail-drawer` and `drawer-close`: the acceptance test hard-codes
+those strings, so the names are historical and say nothing about the layout. Renaming them
+fails the suite.

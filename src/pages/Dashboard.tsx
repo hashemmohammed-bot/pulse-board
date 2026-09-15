@@ -3,7 +3,7 @@ import type { Account, DashboardData } from "../types";
 import { KpiRow } from "../components/KpiRow";
 import { RevenueChart } from "../components/RevenueChart";
 import { AccountsTable } from "../components/AccountsTable";
-import { DetailDrawer } from "../components/DetailDrawer";
+import { AccountDialog } from "../components/AccountDialog";
 
 export function Dashboard({ data }: { data: DashboardData }) {
   const [selected, setSelected] = useState<Account | null>(null);
@@ -13,7 +13,7 @@ export function Dashboard({ data }: { data: DashboardData }) {
       <KpiRow kpis={data.kpis} />
       <RevenueChart series={data.revenueSeries} />
       <AccountsTable accounts={data.accounts} onSelect={setSelected} />
-      {selected && <DetailDrawer account={selected} onClose={() => setSelected(null)} />}
+      {selected && <AccountDialog account={selected} onClose={() => setSelected(null)} />}
     </div>
   );
 }

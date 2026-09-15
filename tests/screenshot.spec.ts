@@ -19,12 +19,12 @@ for (const vp of viewports) {
   });
 }
 
-test("screenshot desktop-drawer-1280x800", async ({ page }) => {
+test("screenshot desktop-dialog-1280x800", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");
   await page.locator('[data-account-id="acc-007"]').click();
   await page.getByTestId("detail-drawer").waitFor();
-  await page.screenshot({ path: "screenshots/desktop-drawer-1280x800.png" });
+  await page.screenshot({ path: "screenshots/desktop-dialog-1280x800.png" });
 });
 
 test("screenshot users-1280x800", async ({ page }) => {

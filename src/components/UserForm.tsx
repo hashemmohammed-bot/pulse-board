@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { User, UserRole } from "../types";
-import { Drawer } from "./Drawer";
+import { Modal } from "./Modal";
 
 const ROLES: UserRole[] = ["Admin", "Manager", "Viewer"];
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -62,11 +62,11 @@ export function UserForm({
   const ring = (field: "name" | "email") => (error?.field === field ? " border-bad ring-2 ring-bad-soft" : "");
 
   return (
-    <Drawer
+    <Modal
       eyebrow={user ? "Edit user" : "New user"}
       title={user ? user.name : "Invite a teammate"}
       onClose={onCancel}
-      testId="user-drawer"
+      testId="user-dialog"
     >
       <form data-testid="user-form" onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
         <div>
@@ -148,6 +148,6 @@ export function UserForm({
           </button>
         </div>
       </form>
-    </Drawer>
+    </Modal>
   );
 }

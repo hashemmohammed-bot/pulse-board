@@ -1,7 +1,7 @@
 import type { Account } from "../types";
 import { currency, formatDate } from "../format";
 import { Badge } from "./Badge";
-import { Drawer } from "./Drawer";
+import { Modal } from "./Modal";
 import { HealthBar } from "./HealthBar";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -13,9 +13,9 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-export function DetailDrawer({ account, onClose }: { account: Account; onClose: () => void }) {
+export function AccountDialog({ account, onClose }: { account: Account; onClose: () => void }) {
   return (
-    <Drawer
+    <Modal
       eyebrow="Account"
       title={account.name}
       onClose={onClose}
@@ -52,6 +52,6 @@ export function DetailDrawer({ account, onClose }: { account: Account; onClose: 
         <p className="text-sm text-muted">Notes</p>
         <p className="mt-1 text-lg leading-relaxed">{account.notes}</p>
       </div>
-    </Drawer>
+    </Modal>
   );
 }
