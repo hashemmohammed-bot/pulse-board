@@ -23,7 +23,7 @@ test.describe("sign-in", () => {
     await expect(page.getByTestId("accounts-table")).toBeHidden();
 
     // A wrong password is rejected.
-    await form.locator('[name="email"]').fill("root");
+    await form.locator('[name="name"]').fill("root");
     await form.locator('[name="password"]').fill("hunter2");
     await page.getByTestId("login-submit").click();
     await expect(page.getByTestId("login-error")).toContainText("Incorrect");
@@ -38,7 +38,7 @@ test.describe("sign-in", () => {
 
   test("the session survives a reload, and signing out ends it", async ({ page }) => {
     await page.goto("/?login=1");
-    await page.getByTestId("login-form").locator('[name="email"]').fill("root");
+    await page.getByTestId("login-form").locator('[name="name"]').fill("root");
     await page.getByTestId("login-form").locator('[name="password"]').fill("root");
     await page.getByTestId("login-submit").click();
     await expect(page.getByTestId("accounts-table")).toBeVisible();

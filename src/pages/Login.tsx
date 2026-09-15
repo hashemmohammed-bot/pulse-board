@@ -1,36 +1,36 @@
 import { useState } from "react";
 import { DEMO_HINT, verifyCredentials } from "../auth";
 
-type FieldError = { field: "email" | "password"; message: string } | null;
+type FieldError = { field: "name" | "password"; message: string } | null;
 
 const FIELD =
   "mt-1.5 w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-base outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
 
 export function Login({ onSignedIn }: { onSignedIn: (username: string) => void }) {
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   // Rendered only after a failed submit, so login-error is absent until then.
   const [error, setError] = useState<FieldError>(null);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim()) {
-      setError({ field: "email", message: "Enter your email." });
+    if (!name.trim()) {
+      setError({ field: "name", message: "Enter your name." });
       return;
     }
     if (!password) {
       setError({ field: "password", message: "Enter your password." });
       return;
     }
-    if (!verifyCredentials(email, password)) {
-      setError({ field: "password", message: "Incorrect email or password." });
+    if (!verifyCredentials(name, password)) {
+      setError({ field: "password", message: "Incorrect name or password." });
       return;
     }
     setError(null);
-    onSignedIn(email.trim());
+    onSignedIn(name.trim());
   }
 
-  const ring = (field: "email" | "password") =>
+  const ring = (field: "name" | "password") =>
     error?.field === field ? " border-bad ring-2 ring-bad-soft" : "";
 
   return (
@@ -45,17 +45,17 @@ export function Login({ onSignedIn }: { onSignedIn: (username: string) => void }
 
         <form data-testid="login-form" onSubmit={handleSubmit} noValidate className="mt-6 flex flex-col gap-5">
           <div>
-            <label htmlFor="login-email" className="text-sm text-muted">
-              Email
+            <label htmlFor="login-name" className="text-sm text-muted">
+              Name
             </label>
             <input
-              id="login-email"
-              name="email"
+              id="login-name"
+              name="name"
               type="text"
               autoComplete="username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={FIELD + ring("email")}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={FIELD + ring("name")}
             />
           </div>
 
