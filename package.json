@@ -15,8 +15,11 @@
     "playwright:install": "playwright install chromium"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "recharts": "^3.10.1",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",

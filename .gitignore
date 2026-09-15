@@ -7,3 +7,5 @@ blob-report
 *.local
 *.tsbuildinfo
 screenshots
+.idea
+.claude/settings.local.json

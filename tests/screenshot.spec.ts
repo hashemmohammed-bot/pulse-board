@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 
 /**
- * Not an acceptance test. `npm run screenshot` captures the current UI at the two
+ * Not an acceptance test. `npm run screenshot` captures the current UI at the
  * viewports the design was drawn for, so you can compare against design/.
  */
 const viewports = [
@@ -18,3 +18,39 @@ for (const vp of viewports) {
     await page.screenshot({ path: `screenshots/${vp.name}.png`, fullPage: true });
   });
 }
+
+test("screenshot desktop-drawer-1280x800", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await page.locator('[data-account-id="acc-007"]').click();
+  await page.getByTestId("detail-drawer").waitFor();
+  await page.screenshot({ path: "screenshots/desktop-drawer-1280x800.png" });
+});
+
+test("screenshot users-1280x800", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await page.getByTestId("nav-users").click();
+  await page.getByTestId("users-page").waitFor();
+  await page.screenshot({ path: "screenshots/users-1280x800.png", fullPage: true });
+});
+
+test("screenshot users-edit-1280x800", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await page.getByTestId("nav-users").click();
+  await page.locator('[data-user-id="usr-006"]').getByTestId("user-edit").click();
+  const form = page.getByTestId("user-form");
+  await form.locator('[name="email"]').fill("amara.okafor@pulseboard");
+  await page.getByTestId("user-save").click();
+  await page.getByTestId("form-error").waitFor();
+  await page.screenshot({ path: "screenshots/users-edit-1280x800.png" });
+});
+
+test("screenshot users-mobile-375x812", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  await page.getByTestId("nav-users").click();
+  await page.getByTestId("users-page").waitFor();
+  await page.screenshot({ path: "screenshots/users-mobile-375x812.png", fullPage: true });
+});
